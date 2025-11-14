@@ -39,9 +39,102 @@ Com base na conversa com a cliente, levantamos os seguintes requisitos iniciais:
 ---
 
 ## 🛠️ Tecnologias Utilizadas
-- **HTML5** e **CSS3** → estrutura e estilo.  
-- **JavaScript (ES6+)** → interatividade e lógica.  
-- **Git & GitHub** → versionamento e colaboração.  
+
+### Frontend
+- **HTML5** e **CSS3** → estrutura e estilo  
+- **JavaScript (ES6+)** → interatividade e lógica  
+
+### Backend ✨ NOVO
+- **Node.js** → runtime JavaScript
+- **Express.js** → framework web  
+- **Sequelize** → ORM para banco de dados  
+- **SQLite3** → banco de dados relacional  
+- **CORS** → comunicação frontend-backend  
+
+### Versionamento
+- **Git & GitHub** → versionamento e colaboração  
+
+---
+
+## 🚀 Como Começar
+
+### Instalação Rápida
+
+1. **Instalar dependências:**
+```bash
+npm install
+```
+
+2. **Criar banco com dados de exemplo (opcional):**
+```bash
+npm run seed
+```
+
+3. **Iniciar servidor:**
+```bash
+npm run dev
+```
+
+4. **Acessar a aplicação:**
+```
+http://localhost:3000
+```
+
+### 📚 Documentação
+- **[INICIO_RAPIDO.md](INICIO_RAPIDO.md)** - Guia de início rápido
+- **[DOCUMENTACAO.md](DOCUMENTACAO.md)** - Documentação técnica completa
+- **[EXEMPLOS_API.md](EXEMPLOS_API.md)** - Exemplos de requisições
+- **[RESUMO.md](RESUMO.md)** - Resumo da implementação
+
+---
+
+## ✅ Status de Implementação
+
+### Funcionalidades Concluídas ✓
+
+#### Cadastro de Clientes e Pets
+- [x] Criar novo cliente (Física/Jurídica)
+- [x] Cadastrar múltiplos pets por cliente
+- [x] Editar informações de cliente e pet
+- [x] Deletar cliente (cascata para pets)
+- [x] Inativar cliente
+- [x] Lista com filtros e busca
+- [x] Validações completas
+
+#### Agendamentos
+- [x] Marcar consultas e procedimentos
+- [x] Validação de conflito de horários
+- [x] Filtro por período e status
+- [x] Busca por cliente, pet, serviço
+- [x] Cancelamento de agendamento
+- [x] Próximos agendamentos
+- [x] Agenda geral com detalhes
+
+#### API RESTful
+- [x] Endpoints para clientes (CRUD)
+- [x] Endpoints para pets (CRUD)
+- [x] Endpoints para agendamentos (CRUD)
+- [x] Endpoints para veterinários
+- [x] Endpoints para serviços
+- [x] Tratamento de erros
+- [x] Validações de dados
+
+#### Banco de Dados
+- [x] Modelos relacionais (Cliente, Pet, Agendamento, Veterinário, Serviço)
+- [x] Relacionamentos (1:N)
+- [x] Soft delete para veterinários e serviços
+- [x] Integridade referencial
+- [x] Seed com dados de exemplo
+
+### Próximas Melhorias (Sugerido)
+- [ ] Registro de atendimentos realizados
+- [ ] Gerenciamento de internações  
+- [ ] Prontuários e histórico médico
+- [ ] Painel de indicadores/dashboard
+- [ ] Responsividade mobile completa
+- [ ] Autenticação e controle de acesso
+- [ ] Relatórios em PDF
+- [ ] Notificações (email/SMS)
 
 ---
 

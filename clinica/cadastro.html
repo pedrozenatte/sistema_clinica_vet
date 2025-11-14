@@ -44,7 +44,9 @@
           </p>
         </div>
         <div class="actions">
-          <button class="btn btn-ghost">Procurar</button>
+          <input type="text" id="inputBuscaRapida" placeholder="Buscar por código..." style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 200px;" />
+          <button class="btn btn-ghost" onclick="buscarClientePorCodigoRapido()">Buscar</button>
+          <button class="btn btn-danger" onclick="deletarClientePorCodigo()" style="margin-left: 10px;">Deletar por Código</button>
           <button class="btn btn-ghost">Novo</button>
           <button class="btn btn-primary">Salvar</button>
         </div>
@@ -57,12 +59,12 @@
           <div class="grid g-3">
             <label class="field">
               <span>Código</span>
-              <input type="text" inputmode="numeric" placeholder="00000" />
+              <input type="text" name="codigo" inputmode="numeric" placeholder="00000" />
             </label>
 
             <label class="field">
               <span>Pessoa</span>
-              <select>
+              <select name="tipo_pessoa">
                 <option>Física</option>
                 <option>Jurídica</option>
               </select>
@@ -70,7 +72,7 @@
 
             <label class="field">
               <span>Situação</span>
-              <select>
+              <select name="situacao">
                 <option>Liberado</option>
                 <option>Inativo</option>
                 <option>Bloqueado</option>
@@ -79,12 +81,12 @@
 
             <label class="field field-wide">
               <span>Nome completo</span>
-              <input type="text" placeholder="Ex.: João da Silva" />
+              <input type="text" name="nome" placeholder="Ex.: João da Silva" />
             </label>
 
             <label class="field">
               <span>Sexo</span>
-              <select>
+              <select name="sexo">
                 <option>F</option>
                 <option>M</option>
                 <option>Outro</option>
@@ -93,7 +95,7 @@
 
             <label class="field">
               <span>Data de nascimento</span>
-              <input type="date" />
+              <input type="date" name="data_nascimento" />
             </label>
           </div>
         </fieldset>
@@ -104,17 +106,17 @@
           <div class="grid g-3">
             <label class="field">
               <span>CPF / CNPJ</span>
-              <input type="text" placeholder="000.000.000-00" />
+              <input type="text" name="cpf_cnpj" placeholder="000.000.000-00" />
             </label>
 
             <label class="field">
               <span>RG / IE</span>
-              <input type="text" placeholder="Documento" />
+              <input type="text" name="rg_ie" placeholder="Documento" />
             </label>
 
             <label class="field">
               <span>UF do documento</span>
-              <select>
+              <select name="uf_documento">
                 <option>SP</option>
                 <option>RJ</option>
                 <option>MG</option>
@@ -124,7 +126,7 @@
 
             <label class="field">
               <span>Estado</span>
-              <input type="text" inputmode="numeric" placeholder="35" />
+              <input type="text" name="estado_numero" inputmode="numeric" placeholder="35" />
             </label>
 
             <label class="check">
@@ -145,35 +147,35 @@
           <div class="grid g-4">
             <label class="field field-3">
               <span>Logradouro</span>
-              <input type="text" placeholder="Rua/Av." />
+              <input type="text" name="rua" placeholder="Rua/Av." />
             </label>
             <label class="field">
               <span>Nº</span>
-              <input type="text" inputmode="numeric" placeholder="123" />
+              <input type="text" name="numero" inputmode="numeric" placeholder="123" />
             </label>
             <label class="field field-2">
               <span>Compl.</span>
-              <input type="text" placeholder="Ap., Bloco, Casa..." />
+              <input type="text" name="complemento" placeholder="Ap., Bloco, Casa..." />
             </label>
 
             <label class="field">
               <span>Bairro</span>
-              <input type="text" />
+              <input type="text" name="bairro" />
             </label>
 
             <label class="field">
               <span>CEP</span>
-              <input type="text" placeholder="00000-000" />
+              <input type="text" name="cep" placeholder="00000-000" />
             </label>
 
             <label class="field">
               <span>Cidade</span>
-              <input type="text" />
+              <input type="text" name="cidade" />
             </label>
 
             <label class="field">
               <span>UF</span>
-              <select>
+              <select name="estado">
                 <option>SP</option>
                 <option>RJ</option>
                 <option>MG</option>
@@ -183,7 +185,7 @@
 
             <label class="field">
               <span>País</span>
-              <input type="text" value="Brasil" />
+              <input type="text" name="pais" value="Brasil" />
             </label>
           </div>
         </fieldset>
@@ -194,15 +196,15 @@
           <div class="grid g-3">
             <label class="field">
               <span>Telefone</span>
-              <input type="tel" placeholder="(00) 0000-0000" />
+              <input type="tel" name="telefone" placeholder="(00) 0000-0000" />
             </label>
             <label class="field">
               <span>Celular</span>
-              <input type="tel" placeholder="(00) 00000-0000" />
+              <input type="tel" name="celular" placeholder="(00) 00000-0000" />
             </label>
             <label class="field field-wide">
               <span>E-mail</span>
-              <input type="email" placeholder="email@exemplo.com" />
+              <input type="email" name="email" placeholder="email@exemplo.com" />
             </label>
             <label class="check">
               <input type="checkbox" />
@@ -217,11 +219,11 @@
           <div class="grid g-4">
             <label class="field">
               <span>Nome do Pet</span>
-              <input type="text" placeholder="Ex.: Luna" />
+              <input type="text" name="pet_nome" placeholder="Ex.: Luna" />
             </label>
             <label class="field">
               <span>Espécie</span>
-              <select>
+              <select name="pet_especie">
                 <option>Canina</option>
                 <option>Felina</option>
                 <option>Aves</option>
@@ -230,11 +232,11 @@
             </label>
             <label class="field">
               <span>Raça</span>
-              <input type="text" placeholder="Ex.: SRD" />
+              <input type="text" name="pet_raca" placeholder="Ex.: SRD" />
             </label>
             <label class="field">
               <span>Sexo</span>
-              <select>
+              <select name="pet_sexo">
                 <option>Fêmea</option>
                 <option>Macho</option>
               </select>
@@ -242,11 +244,11 @@
 
             <label class="field">
               <span>Data de Nasc.</span>
-              <input type="date" />
+              <input type="date" name="pet_data_nascimento" />
             </label>
             <label class="field">
               <span>Peso (kg)</span>
-              <input type="number" step="0.01" placeholder="0,00" />
+              <input type="number" name="pet_peso" step="0.01" placeholder="0,00" />
             </label>
             <label class="field">
               <span>Microchip</span>
@@ -275,11 +277,6 @@
         <div class="form-actions">
           <button type="reset" class="btn btn-ghost">Limpar</button>
           <div class="spacer"></div>
-          <button type="button" class="btn btn-danger">Excluir</button>
-          <button type="button" class="btn btn-ghost">Inativar</button>
-          <button type="submit" class="btn btn-primary">
-            Salvar Cadastro
-          </button>
         </div>
       </form>
 
@@ -335,52 +332,7 @@
               </tr>
             </thead>
             <tbody id="cadastrosBody">
-              <!-- EXEMPLOS -->
-              <tr>
-                <td>00136</td>
-                <td>João da Silva</td>
-                <td>Física</td>
-                <td>635.843.340-71</td>
-                <td>Luna (Canina)</td>
-                <td>(19) 1234-5678</td>
-                <td>joao@email.com</td>
-                <td>Mogi Mirim/SP</td>
-                <td><span class="badge badge-success">Ativo</span></td>
-                <td>
-                  <a href="#" class="btn-small">Ver</a>
-                  <a href="#" class="btn-small btn-small-ghost">Editar</a>
-                </td>
-              </tr>
-              <tr>
-                <td>00158</td>
-                <td>Clínica Amiga Ltda.</td>
-                <td>Jurídica</td>
-                <td>12.345.678/0001-90</td>
-                <td>—</td>
-                <td>(19) 3333-2222</td>
-                <td>contato@amiga.com.br</td>
-                <td>Campinas/SP</td>
-                <td><span class="badge badge-neutral">Inativo</span></td>
-                <td>
-                  <a href="#" class="btn-small">Ver</a>
-                  <a href="#" class="btn-small btn-small-ghost">Editar</a>
-                </td>
-              </tr>
-              <tr>
-                <td>00174</td>
-                <td>Mariana Souza</td>
-                <td>Física</td>
-                <td>401.235.654-00</td>
-                <td>Thor (Felina)</td>
-                <td>(19) 98888-7777</td>
-                <td>mariana@email.com</td>
-                <td>Jaguariúna/SP</td>
-                <td><span class="badge badge-success">Ativo</span></td>
-                <td>
-                  <a href="#" class="btn-small">Ver</a>
-                  <a href="#" class="btn-small btn-small-ghost">Editar</a>
-                </td>
-              </tr>
+              <!-- Dados carregados dinamicamente via JavaScript -->
             </tbody>
           </table>
         </div>
@@ -396,5 +348,8 @@
         <small>© Clínica Vet — Cadastros</small>
       </footer>
     </main>
+
+    <script src="utils.js"></script>
+    <script src="cadastro.js"></script>
   </body>
 </html>
