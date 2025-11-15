@@ -44,7 +44,7 @@ Com base na conversa com a cliente, levantamos os seguintes requisitos iniciais:
 - **HTML5** e **CSS3** → estrutura e estilo  
 - **JavaScript (ES6+)** → interatividade e lógica  
 
-### Backend ✨ NOVO
+### Backend
 - **Node.js** → runtime JavaScript
 - **Express.js** → framework web  
 - **Sequelize** → ORM para banco de dados  
@@ -101,15 +101,6 @@ http://localhost:3000
 - [x] Lista com filtros e busca
 - [x] Validações completas
 
-#### Agendamentos
-- [x] Marcar consultas e procedimentos
-- [x] Validação de conflito de horários
-- [x] Filtro por período e status
-- [x] Busca por cliente, pet, serviço
-- [x] Cancelamento de agendamento
-- [x] Próximos agendamentos
-- [x] Agenda geral com detalhes
-
 #### API RESTful
 - [x] Endpoints para clientes (CRUD)
 - [x] Endpoints para pets (CRUD)
@@ -125,27 +116,6 @@ http://localhost:3000
 - [x] Soft delete para veterinários e serviços
 - [x] Integridade referencial
 - [x] Seed com dados de exemplo
-
-### Próximas Melhorias (Sugerido)
-- [ ] Registro de atendimentos realizados
-- [ ] Gerenciamento de internações  
-- [ ] Prontuários e histórico médico
-- [ ] Painel de indicadores/dashboard
-- [ ] Responsividade mobile completa
-- [ ] Autenticação e controle de acesso
-- [ ] Relatórios em PDF
-- [ ] Notificações (email/SMS)
-
----
-
-## 🚀 Próximos Passos
-- Modularizar componentes repetidos (barra lateral, cabeçalho, rodapé).  
-- Implementar funcionalidades com **JavaScript**:  
-  - Validação de formulários.  
-  - Listagem dinâmica de dados.  
-  - Filtros de pesquisa e ordenação.  
-- Iniciar a integração com dados **mockados em JSON**.  
-- Desenvolver protótipo inicial do **painel interativo** com gráficos.  
 
 ---
 
