@@ -138,42 +138,6 @@ http://localhost:3000
 - Data
 - Hora
 
-## 🎯 Exemplos de Uso
-
-### Cenário 1: Novo Cliente com Pet
-
-1. Acesse **Cadastro**
-2. Clique em **"Novo"**
-3. Preencha:
-   ```
-   Código: 00301
-   Pessoa: Física
-   Nome: Maria Silva
-   Email: maria@email.com
-   Telefone: (19) 9999-1111
-   
-   Pet:
-   Nome: Bella
-   Espécie: Canina
-   Raça: Golden Retriever
-   ```
-4. Clique em **"Salvar Cadastro"**
-
-### Cenário 2: Agendar Consulta
-
-1. Acesse **Agendamentos**
-2. Clique em **"Novo"**
-3. Preencha:
-   ```
-   Tutor: Maria Silva (digitar e aguardar busca)
-   Pet: Bella
-   Serviço: Consulta
-   Veterinário: Dra. Ana Silva
-   Data: 25/12/2025
-   Hora: 14:00
-   ```
-4. Clique em **"Agendar"**
-
 ## 🐛 Solução de Problemas
 
 ### Erro: "CORS Error" ou "Erro de conexão"
