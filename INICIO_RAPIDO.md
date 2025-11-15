@@ -96,47 +96,6 @@ http://localhost:3000
 - Nome do Pet
 - Espécie do Pet
 
-### ✅ Página de Agendamentos (`/agendamentos.html`)
-
-**O que você pode fazer:**
-
-1. **Criar Novo Agendamento**
-   - Clique em "Novo"
-   - Digite o nome do tutor (busca automática)
-   - Digite o nome do pet
-   - Selecione o serviço desejado
-   - Selecione o veterinário
-   - Escolha data e hora
-   - Clique em "Agendar"
-
-2. **Validações Automáticas**
-   - ✓ Não permite agendar dois atendimentos no mesmo horário para o mesmo veterinário
-   - ✓ Obriga seleção válida de cliente e pet
-   - ✓ Valida todos os campos obrigatórios
-
-3. **Visualizar/Editar Agendamento**
-   - Clique em uma linha da tabela "Agenda de Agendamentos"
-   - Modifique os dados
-   - Clique em "Salvar" para atualizar
-
-4. **Cancelar Agendamento**
-   - Carregue um agendamento
-   - Clique em "Cancelar"
-   - O status mudará para "Cancelado"
-
-5. **Filtrar Agendamentos**
-   - Use os filtros no topo:
-     - De / Até: Filtrar por período
-     - Status: Agendado, Confirmado, Realizado, Cancelado
-     - Busca: Pet, tutor, serviço, veterinário
-
-**Campos Obrigatórios:**
-- Tutor (cliente válido)
-- Pet (pertencente ao cliente)
-- Veterinário
-- Serviço
-- Data
-- Hora
 
 ## 🐛 Solução de Problemas
 
@@ -182,33 +141,6 @@ Banco de Dados (SQLite)
     ↓ (Resposta JSON)
 Frontend (Atualiza a página)
 ```
-
-## ✨ Recursos Extras
-
-### Máscaras de Entrada
-- **CPF/CNPJ**: 123.456.789-00 ou 12.345.678/0001-90
-- **Telefone**: (19) 1234-5678 ou (19) 99999-9999
-- **CEP**: 13800-000
-
-### Formatação
-- **Datas**: 25/12/2025
-- **Horas**: 14:30
-- **Valores**: R$ 150,00
-
-### Validações
-- Código único para clientes
-- CRMV único para veterinários
-- Email válido (formato)
-- Pet deve pertencer ao cliente
-- Sem conflito de horários
-
-## 📞 Suporte
-
-Se encontrar algum problema:
-1. Verifique se todos os passos foram seguidos
-2. Certifique-se de que o Node.js está instalado (versão 14+)
-3. Delete `node_modules` e execute `npm install` novamente
-4. Se o banco ficar corrompido, delete `backend/database/clinica.db`
 
 ---
 
