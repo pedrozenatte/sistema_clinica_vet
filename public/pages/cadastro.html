@@ -41,70 +41,60 @@
         <div>
           <h1>Cadastro de Clientes e Pets</h1>
           <p class="muted">
-            Preencha os dados para criar/atualizar o registro.
+            Utilize os botões para incluir pessoas ou pets; a lista é a visão inicial.
           </p>
         </div>
         <div class="actions">
           <input type="text" id="inputBuscaRapida" placeholder="Buscar por código..." style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 200px;" />
           <button class="btn btn-ghost" onclick="buscarClientePorCodigoRapido()">Buscar</button>
           <button class="btn btn-danger" onclick="deletarClientePorCodigo()" style="margin-left: 10px;">Deletar por Código</button>
-          <button class="btn btn-ghost" type="reset" form="formCadastro">Novo</button>
-          <button class="btn btn-primary" type="button" id="btnSalvarCadastro">
-            Salvar
-          </button>
+          <button class="btn btn-primary" type="button" id="btnMostrarForm">Adicionar pessoa</button>
+          <button class="btn btn-ghost" type="button" id="btnAbrirModalPet">Adicionar pet</button>
         </div>
       </header>
 
+      <div id="formWrapper" hidden>
       <form class="form" id="formCadastro" autocomplete="on">
         <!-- DADOS DO TUTOR -->
         <fieldset class="card">
           <legend>Dados do Tutor</legend>
           <div class="grid g-3">
             <label class="field field-wide">
-              <span>Nome completo</span>
-              <input type="text" name="nome" placeholder="Ex.: João da Silva" />
+              <span>Nome completo <strong class="required">*</strong></span>
+              <input type="text" name="nome" placeholder="Ex.: João da Silva" required />
             </label>
 
             <label class="field">
-              <span>Sexo</span>
-              <select name="sexo">
-                <option>F</option>
-                <option>M</option>
-                <option>Outro</option>
-              </select>
+              <span>CPF <strong class="required">*</strong></span>
+              <input type="text" name="cpf" placeholder="000.000.000-00" required />
             </label>
 
             <label class="field">
-              <span>Data de nascimento</span>
-              <input type="date" name="data_nascimento" />
+              <span>Código do cliente</span>
+              <input type="text" name="codigo" placeholder="CLI-1234 (opcional)" />
             </label>
           </div>
         </fieldset>
 
-        <!-- DOCUMENTOS -->
+        <!-- CONTATO -->
         <fieldset class="card">
-          <legend>Documentos</legend>
+          <legend>Contato</legend>
           <div class="grid g-3">
             <label class="field">
-              <span>CPF</span>
-              <input type="text" name="cpf" placeholder="000.000.000-00" />
+              <span>Telefone <strong class="required">*</strong></span>
+              <input type="tel" name="telefone" placeholder="(00) 0000-0000" required />
             </label>
-
-            <label class="field">
-              <span>RG</span>
-              <input type="text" name="rg" placeholder="Documento" />
+            <label class="field field-wide">
+              <span>E-mail <strong class="required">*</strong></span>
+              <input type="email" name="email" placeholder="email@exemplo.com" required />
             </label>
-
             <label class="field">
-              <span>UF do documento</span>
-              <select name="uf_documento">
-                <option>SP</option>
-                <option>RJ</option>
-                <option>MG</option>
-                <option>PR</option>
+              <span>Situação</span>
+              <select name="situacao">
+                <option value="Ativo" selected>Ativo</option>
+                <option value="Inativo">Inativo</option>
               </select>
             </label>
-
           </div>
         </fieldset>
 
@@ -113,12 +103,12 @@
           <legend>Endereço</legend>
           <div class="grid g-4">
             <label class="field field-3">
-              <span>Logradouro</span>
-              <input type="text" name="rua" placeholder="Rua/Av." />
+              <span>Logradouro <strong class="required">*</strong></span>
+              <input type="text" name="rua" placeholder="Rua/Av." required />
             </label>
             <label class="field">
-              <span>Nº</span>
-              <input type="text" name="numero" inputmode="numeric" placeholder="123" />
+              <span>Nº <strong class="required">*</strong></span>
+              <input type="text" name="numero" inputmode="numeric" placeholder="123" required />
             </label>
             <label class="field field-2">
               <span>Compl.</span>
@@ -126,18 +116,18 @@
             </label>
 
             <label class="field">
-              <span>Bairro</span>
-              <input type="text" name="bairro" />
+              <span>Bairro <strong class="required">*</strong></span>
+              <input type="text" name="bairro" required />
             </label>
 
             <label class="field">
-              <span>CEP</span>
-              <input type="text" name="cep" placeholder="00000-000" />
+              <span>CEP <strong class="required">*</strong></span>
+              <input type="text" name="cep" placeholder="00000-000" required />
             </label>
 
             <label class="field">
-              <span>Cidade</span>
-              <input type="text" name="cidade" />
+              <span>Cidade <strong class="required">*</strong></span>
+              <input type="text" name="cidade" required />
             </label>
 
             <label class="field">
@@ -151,76 +141,23 @@
             </label>
 
             <label class="field">
-              <span>País</span>
-              <input type="text" name="pais" value="Brasil" />
+              <span>País <strong class="required">*</strong></span>
+              <input type="text" name="pais" value="Brasil" required />
             </label>
           </div>
         </fieldset>
 
-        <!-- CONTATO -->
+        <!-- DADOS DOS PETS -->
         <fieldset class="card">
-          <legend>Contato</legend>
-          <div class="grid g-3">
-            <label class="field">
-              <span>Telefone</span>
-              <input type="tel" name="telefone" placeholder="(00) 0000-0000" />
-            </label>
-            <label class="field field-wide">
-              <span>E-mail</span>
-              <input type="email" name="email" placeholder="email@exemplo.com" />
-            </label>
-            <label class="check">
-              <input type="checkbox" />
-              <span>Receber boleto por e-mail</span>
-            </label>
-          </div>
-        </fieldset>
-
-        <!-- DADOS DO PET -->
-        <fieldset class="card">
-          <legend>Dados do Pet</legend>
-          <div class="grid g-4">
-            <label class="field">
-              <span>Nome do Pet</span>
-              <input type="text" name="pet_nome" placeholder="Ex.: Luna" />
-            </label>
-            <label class="field">
-              <span>Espécie</span>
-              <select name="pet_especie">
-                <option>Canina</option>
-                <option>Felina</option>
-                <option>Aves</option>
-                <option>Outros</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Raça</span>
-              <input type="text" name="pet_raca" placeholder="Ex.: SRD" />
-            </label>
-            <label class="field">
-              <span>Sexo</span>
-              <select name="pet_sexo">
-                <option>Fêmea</option>
-                <option>Macho</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span>Data de Nasc.</span>
-              <input type="date" name="pet_data_nascimento" />
-            </label>
-            <label class="field">
-              <span>Peso (kg)</span>
-              <input type="number" name="pet_peso" step="0.01" placeholder="0,00" />
-            </label>
-            <label class="field">
-              <span>Microchip</span>
-              <input type="text" />
-            </label>
-            <label class="check">
-              <input type="checkbox" />
-              <span>Vacinado</span>
-            </label>
+          <legend>Pets do tutor</legend>
+          <p class="muted small">
+            Uma pessoa pode ter mais de um pet. Preencha ao menos um pet com nome e espécie.
+          </p>
+          <div id="petsContainer" class="pet-list"></div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" id="btnAddPet">Adicionar pet</button>
+            <div class="spacer"></div>
+            <button type="button" class="btn btn-primary" id="btnAbrirModalPet">Adicionar pet (tutor existente)</button>
           </div>
         </fieldset>
 
@@ -231,6 +168,7 @@
             <span>Observações gerais</span>
             <textarea
               rows="4"
+              name="observacoes"
               placeholder="Alergias, restrições, preferência de contato..."
             ></textarea>
           </label>
@@ -240,6 +178,10 @@
         <div class="form-actions">
           <button type="reset" class="btn btn-ghost">Limpar</button>
           <div class="spacer"></div>
+          <button type="button" class="btn btn-danger" id="btnCancelarForm">Cancelar</button>
+          <button class="btn btn-primary" type="button" id="btnSalvarCadastro">
+            Salvar
+          </button>
         </div>
       </form>
 
@@ -250,10 +192,11 @@
             <p class="muted small">Revise os dados e confirme o cadastro.</p>
           </div>
           <div class="form-save-bar__actions">
-            <button class="btn btn-primary">Salvar cadastro</button>
+            <button class="btn btn-primary" id="btnSalvarBar" type="button">Salvar cadastro</button>
           </div>
         </div>
       </aside>
+      </div>
 
       <!-- LISTA DE PESSOAS CADASTRADAS -->
       <section class="card" id="lista-cadastros">
@@ -317,5 +260,43 @@
 
     <script src="../scripts/utils.js"></script>
     <script src="../scripts/cadastro.js"></script>
+
+    <!-- Modal de novo pet -->
+    <div class="modal-backdrop" id="modalPet" hidden>
+      <div class="modal">
+        <header class="modal__header">
+          <h2>Adicionar pet para tutor</h2>
+          <button class="btn btn-ghost" id="btnFecharModalPet">Fechar</button>
+        </header>
+        <form class="modal__body" id="formNovoPet">
+          <label class="field">
+            <span>Tutor (busque por código ou nome) <strong class="required">*</strong></span>
+            <input type="text" name="codigo" placeholder="CLI-1234 ou nome" list="listaTutores" required />
+            <datalist id="listaTutores"></datalist>
+          </label>
+          <div class="grid g-2">
+            <label class="field">
+              <span>Nome do Pet <strong class="required">*</strong></span>
+              <input type="text" name="pet_nome" placeholder="Ex.: Luna" required />
+            </label>
+            <label class="field">
+              <span>Espécie <strong class="required">*</strong></span>
+              <select name="pet_especie" required>
+                <option value="">Selecione</option>
+                <option>Canina</option>
+                <option>Felina</option>
+                <option>Aves</option>
+                <option>Outros</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-actions">
+            <div class="spacer"></div>
+            <button type="button" class="btn btn-ghost" id="btnCancelarModalPet">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar pet</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </body>
 </html>

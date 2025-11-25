@@ -5,8 +5,34 @@
   const buscaRapidaInput = document.getElementById('inputBuscaRapida');
   const form = document.getElementById('formCadastro');
   const btnSalvar = document.getElementById('btnSalvarCadastro');
+  const btnSalvarBar = document.getElementById('btnSalvarBar');
+  const petsContainer = document.getElementById('petsContainer');
+  const btnAddPet = document.getElementById('btnAddPet');
+  const btnMostrarForm = document.getElementById('btnMostrarForm');
+  const btnAbrirModalPet = document.getElementById('btnAbrirModalPet');
+  const modalPet = document.getElementById('modalPet');
+  const btnFecharModalPet = document.getElementById('btnFecharModalPet');
+  const btnCancelarModalPet = document.getElementById('btnCancelarModalPet');
+  const formNovoPet = document.getElementById('formNovoPet');
+  const formWrapper = document.getElementById('formWrapper');
+  const btnCancelarForm = document.getElementById('btnCancelarForm');
+  const listaTutores = document.getElementById('listaTutores');
 
   const clientes = [];
+  let editingCodigo = null;
+
+  const requiredFields = [
+    { name: 'nome', label: 'Nome completo' },
+    { name: 'telefone', label: 'Telefone' },
+    { name: 'email', label: 'E-mail' },
+    { name: 'cpf', label: 'CPF' },
+    { name: 'rua', label: 'Logradouro' },
+    { name: 'numero', label: 'Nº' },
+    { name: 'bairro', label: 'Bairro' },
+    { name: 'cep', label: 'CEP' },
+    { name: 'cidade', label: 'Cidade' },
+    { name: 'pais', label: 'País' },
+  ];
 
   const statusPill = (status) =>
     `<span class="badge ${status === 'Ativo' ? 'badge-success' : 'badge-neutral'}">${status}</span>`;
@@ -73,6 +99,69 @@
   situacaoFiltro?.addEventListener('change', filtrar);
   buscaInput?.addEventListener('input', filtrarDebounced);
 
+  const petRowTemplate = (pet = {}, index = 0) => `
+    <div class="pet-row" data-index="${index}">
+      <div class="grid g-4">
+        <label class="field">
+          <span>Nome do Pet <strong class="required">*</strong></span>
+          <input type="text" name="pet_nome" value="${pet.nome || ''}" placeholder="Ex.: Luna" />
+        </label>
+        <label class="field">
+          <span>Espécie <strong class="required">*</strong></span>
+          <select name="pet_especie">
+            <option ${pet.especie === 'Canina' ? 'selected' : ''}>Canina</option>
+            <option ${pet.especie === 'Felina' ? 'selected' : ''}>Felina</option>
+            <option ${pet.especie === 'Aves' ? 'selected' : ''}>Aves</option>
+            <option ${pet.especie === 'Outros' ? 'selected' : ''}>Outros</option>
+          </select>
+        </label>
+        <label class="field field-2">
+          <span>Observações</span>
+          <input type="text" name="pet_obs" value="${pet.observacoes || ''}" placeholder="Raça, idade, observações..." />
+        </label>
+        <div class="pet-row__actions">
+          <button type="button" class="btn btn-ghost btn-small" data-action="remove-pet">Remover</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const renderPets = (pets = []) => {
+    if (!petsContainer) return;
+    const lista = pets.length ? pets : [{}];
+    petsContainer.innerHTML = lista.map((pet, index) => petRowTemplate(pet, index)).join('');
+  };
+
+  const collectPets = () => {
+    if (!petsContainer) return [];
+    const rows = Array.from(petsContainer.querySelectorAll('.pet-row'));
+    return rows
+      .map((row) => {
+        const nome = row.querySelector('input[name="pet_nome"]')?.value.trim() || '';
+        const especie = row.querySelector('select[name="pet_especie"]')?.value.trim() || '';
+        if (!nome && !especie) return null;
+        return { nome, especie };
+      })
+      .filter(Boolean);
+  };
+
+  const ensureAtLeastOnePetRow = () => {
+    if (!petsContainer) return;
+    if (!petsContainer.querySelector('.pet-row')) {
+      renderPets([{}]);
+    }
+  };
+
+  const setEditingState = (cliente) => {
+    editingCodigo = cliente?.codigo || null;
+    if (btnSalvar) {
+      btnSalvar.textContent = editingCodigo ? 'Atualizar' : 'Salvar';
+    }
+    if (btnSalvarBar) {
+      btnSalvarBar.textContent = editingCodigo ? 'Atualizar cadastro' : 'Salvar cadastro';
+    }
+  };
+
   const highlightRow = (codigo) => {
     if (!tableBody) return;
     const row = tableBody.querySelector(`[data-codigo="${codigo}"]`);
@@ -89,6 +178,7 @@
       const data = await resp.json();
       clientes.splice(0, clientes.length, ...data);
       filtrar();
+      atualizarListaTutores();
     } catch (error) {
       console.error(error);
       alert('Não foi possível carregar os cadastros. Verifique o servidor.');
@@ -106,20 +196,51 @@
       cpf: sanitize(data.get('cpf')),
       email: sanitize(data.get('email')),
       telefone: sanitize(data.get('telefone')),
-      situacao: 'Ativo',
+      situacao: data.get('situacao') || 'Ativo',
+      codigo: sanitize(data.get('codigo')) || undefined,
+      rua: sanitize(data.get('rua')),
+      numero: sanitize(data.get('numero')),
+      complemento: sanitize(data.get('complemento')),
+      bairro: sanitize(data.get('bairro')),
+      cep: sanitize(data.get('cep')),
+      cidade: sanitize(data.get('cidade')),
+      uf: sanitize(data.get('estado')),
+      pais: sanitize(data.get('pais')),
     };
 
-    const petNome = sanitize(data.get('pet_nome'));
-    const petEspecie = sanitize(data.get('pet_especie'));
-    if (petNome) {
-      payload.pet = { nome: petNome, especie: petEspecie || null };
+    const pets = collectPets();
+    const missing = [];
+
+    requiredFields.forEach((field) => {
+      if (!payload[field.name]) {
+        missing.push(field.label);
+      }
+    });
+
+    if (!pets.length) {
+      missing.push('Pelo menos um pet com Nome e Espécie');
+    } else {
+      const petsInvalidos = pets.some((p) => !p.nome || !p.especie);
+      if (petsInvalidos) missing.push('Pet sem nome ou espécie');
     }
+
+    if (missing.length) {
+      alert(`Não é possível concluir o cadastro. Faltam: ${missing.join(', ')}.`);
+      return null;
+    }
+
+    payload.pets = pets;
     return payload;
   };
 
-  const adicionarClienteLocal = (cliente) => {
+  const atualizarClienteLocal = (cliente) => {
     if (!cliente) return;
-    clientes.unshift(cliente);
+    const index = clientes.findIndex((item) => item.codigo === cliente.codigo);
+    if (index >= 0) {
+      clientes[index] = cliente;
+    } else {
+      clientes.unshift(cliente);
+    }
     filtrar();
     highlightRow(cliente.codigo);
   };
@@ -127,15 +248,16 @@
   const salvarCliente = async () => {
     const payload = buildPayload();
     if (!payload) return;
-    if (!payload.nome) {
-      alert('Preencha o campo Nome.');
-      return;
-    }
+
     btnSalvar?.setAttribute('disabled', 'disabled');
+    btnSalvarBar?.setAttribute('disabled', 'disabled');
+
+    const method = editingCodigo ? 'PUT' : 'POST';
+    const url = editingCodigo ? `/api/clientes/${editingCodigo}` : '/api/clientes';
 
     try {
-      const resp = await fetch('/api/clientes', {
-        method: 'POST',
+      const resp = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
@@ -143,15 +265,18 @@
         const info = await resp.json();
         throw new Error(info?.error || 'Erro ao salvar cadastro.');
       }
-      const clienteCriado = await resp.json();
+      const clienteSalvo = await resp.json();
       form?.reset();
-      adicionarClienteLocal(clienteCriado);
-      alert(`Cliente ${clienteCriado.codigo} salvo com sucesso!`);
+      renderPets([{}]);
+      setEditingState(null);
+      atualizarClienteLocal(clienteSalvo);
+      alert(`Cliente ${clienteSalvo.codigo} salvo com sucesso!`);
     } catch (error) {
       console.error(error);
       alert(error.message);
     } finally {
       btnSalvar?.removeAttribute('disabled');
+      btnSalvarBar?.removeAttribute('disabled');
     }
   };
 
@@ -195,6 +320,11 @@
         clientes.splice(index, 1);
         filtrar();
       }
+      if (editingCodigo === codigo) {
+        form?.reset();
+        renderPets([{}]);
+        setEditingState(null);
+      }
       alert(`Cliente ${codigo} removido.`);
     } catch (error) {
       console.error(error);
@@ -202,12 +332,170 @@
     }
   };
 
+  const preencherFormulario = (cliente) => {
+    if (!form || !cliente) return;
+    form.reset();
+    abrirFormulario();
+    form.querySelector('input[name="nome"]').value = cliente.nome || '';
+    form.querySelector('input[name="cpf"]').value = cliente.cpf || '';
+    form.querySelector('input[name="telefone"]').value = cliente.telefone || '';
+    form.querySelector('input[name="email"]').value = cliente.email || '';
+    form.querySelector('input[name="codigo"]').value = cliente.codigo || '';
+    const situacao = form.querySelector('select[name="situacao"]');
+    if (situacao) situacao.value = cliente.situacao || 'Ativo';
+
+    renderPets(cliente.pets || [{}]);
+    setEditingState(cliente);
+    highlightRow(cliente.codigo);
+  };
+
+  const carregarClienteParaEdicao = async (codigo) => {
+    try {
+      const resp = await fetch(`/api/clientes/${codigo}`);
+      if (!resp.ok) throw new Error('Cliente não encontrado.');
+      const cliente = await resp.json();
+      preencherFormulario(cliente);
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
+
+  tableBody?.addEventListener('click', (event) => {
+    const btn = event.target.closest('button[data-codigo]');
+    if (btn) {
+      event.preventDefault();
+      const codigo = btn.getAttribute('data-codigo');
+      carregarClienteParaEdicao(codigo);
+    }
+  });
+
+  form?.addEventListener('reset', () => {
+    setEditingState(null);
+    renderPets([{}]);
+  });
+
+  const abrirFormulario = () => {
+    if (!formWrapper) return;
+    formWrapper.removeAttribute('hidden');
+  };
+
+  const fecharFormulario = () => {
+    if (!formWrapper) return;
+    formWrapper.setAttribute('hidden', 'hidden');
+    setEditingState(null);
+    form?.reset();
+    renderPets([{}]);
+  };
+
+  btnMostrarForm?.addEventListener('click', () => {
+    abrirFormulario();
+    setEditingState(null);
+    form?.reset();
+    renderPets([{}]);
+  });
+
+  btnCancelarForm?.addEventListener('click', () => {
+    fecharFormulario();
+  });
+
   form?.addEventListener('submit', (event) => {
     event.preventDefault();
     salvarCliente();
   });
 
   btnSalvar?.addEventListener('click', salvarCliente);
+  btnSalvarBar?.addEventListener('click', salvarCliente);
+  btnAddPet?.addEventListener('click', () => {
+    const currentPets = collectPets();
+    currentPets.push({});
+    renderPets(currentPets);
+  });
+
+  const toggleModalPet = (open) => {
+    if (!modalPet) return;
+    if (open) {
+      modalPet.removeAttribute('hidden');
+    } else {
+      modalPet.setAttribute('hidden', 'hidden');
+    }
+  };
+
+  const salvarNovoPet = async (event) => {
+    event.preventDefault();
+    if (!formNovoPet) return;
+    const data = new FormData(formNovoPet);
+    const codigo = extrairCodigoTutor(data.get('codigo') || '');
+    const nome = (data.get('pet_nome') || '').trim();
+    const especie = (data.get('pet_especie') || '').trim();
+
+    const faltantes = [];
+    if (!codigo) faltantes.push('Código do tutor');
+    if (!nome) faltantes.push('Nome do pet');
+    if (!especie) faltantes.push('Espécie');
+
+    if (faltantes.length) {
+      alert(`Preencha: ${faltantes.join(', ')}.`);
+      return;
+    }
+
+    const submitBtn = formNovoPet.querySelector('button[type="submit"]');
+    submitBtn?.setAttribute('disabled', 'disabled');
+
+    try {
+      const resp = await fetch(`/api/clientes/${codigo}/pets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, especie }),
+      });
+      if (!resp.ok) {
+        const info = await resp.json();
+        throw new Error(info?.error || 'Erro ao salvar pet.');
+      }
+      await resp.json();
+      alert(`Pet adicionado ao cliente ${codigo}.`);
+      formNovoPet.reset();
+      toggleModalPet(false);
+      carregarClientes();
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    } finally {
+      submitBtn?.removeAttribute('disabled');
+    }
+  };
+
+  btnAbrirModalPet?.addEventListener('click', () => toggleModalPet(true));
+  btnFecharModalPet?.addEventListener('click', () => toggleModalPet(false));
+  btnCancelarModalPet?.addEventListener('click', () => {
+    formNovoPet?.reset();
+    toggleModalPet(false);
+  });
+  formNovoPet?.addEventListener('submit', salvarNovoPet);
+
+  petsContainer?.addEventListener('click', (event) => {
+    const action = event.target.dataset.action;
+    if (action === 'remove-pet') {
+      const row = event.target.closest('.pet-row');
+      row?.remove();
+      ensureAtLeastOnePetRow();
+    }
+  });
+
+  const atualizarListaTutores = () => {
+    if (!listaTutores) return;
+    const options = clientes
+      .map((c) => `<option value="${c.codigo} — ${c.nome}"></option>`)
+      .join('');
+    listaTutores.innerHTML = options;
+  };
+
+  const extrairCodigoTutor = (valor) => {
+    if (!valor) return '';
+    const match = valor.trim().match(/^(\S+)/);
+    return match ? match[1] : valor.trim();
+  };
 
   carregarClientes();
+  ensureAtLeastOnePetRow();
 })();
