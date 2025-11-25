@@ -17,6 +17,10 @@
   const formWrapper = document.getElementById('formWrapper');
   const btnCancelarForm = document.getElementById('btnCancelarForm');
   const listaTutores = document.getElementById('listaTutores');
+  const modalDetalhes = document.getElementById('modalDetalhes');
+  const btnFecharDetalhes = document.getElementById('btnFecharDetalhes');
+  const detalhesBody = document.getElementById('detalhesBody');
+  const detalhesTitulo = document.getElementById('detalhesTitulo');
 
   const clientes = [];
   let editingCodigo = null;
@@ -60,7 +64,10 @@
           <td>${cliente.cidade || '—'}</td>
           <td>${statusPill(cliente.situacao || 'Ativo')}</td>
           <td>
-            <button type="button" class="btn btn-ghost" data-codigo="${cliente.codigo}">Editar</button>
+            <div class="table-actions">
+              <button type="button" class="btn btn-ghost btn-small" data-action="view" data-codigo="${cliente.codigo}">Ver</button>
+              <button type="button" class="btn btn-ghost btn-small" data-action="edit" data-codigo="${cliente.codigo}">Editar</button>
+            </div>
           </td>
         </tr>
       `;
@@ -403,11 +410,98 @@
     }
   };
 
+  const renderDetalhes = (cliente) => {
+    if (!detalhesBody || !detalhesTitulo) return;
+    detalhesTitulo.textContent = `${cliente.nome || 'Cliente'} — ${cliente.codigo || ''}`;
+
+    const endereco = [
+      cliente.rua,
+      cliente.numero,
+      cliente.complemento,
+      cliente.bairro,
+      cliente.cidade,
+      cliente.estado,
+      cliente.cep,
+      cliente.pais,
+    ]
+      .filter(Boolean)
+      .join(', ');
+
+    const petsLista = (cliente.pets || []).map((pet) => {
+      const detalhes = [pet.especie, pet.raca].filter(Boolean).join(' — ');
+      return `<li><strong>${pet.nome}</strong>${detalhes ? ` (${detalhes})` : ''}</li>`;
+    });
+
+    detalhesBody.innerHTML = `
+      <div class="detail-grid">
+        <div>
+          <span class="detail-label">Código</span>
+          <strong class="detail-value">${cliente.codigo || '—'}</strong>
+        </div>
+        <div>
+          <span class="detail-label">Situação</span>
+          <strong class="detail-value">${cliente.situacao || '—'}</strong>
+        </div>
+        <div class="detail-full">
+          <span class="detail-label">Nome</span>
+          <strong class="detail-value">${cliente.nome || '—'}</strong>
+        </div>
+        <div>
+          <span class="detail-label">CPF</span>
+          <strong class="detail-value">${cliente.cpf || '—'}</strong>
+        </div>
+        <div>
+          <span class="detail-label">Telefone</span>
+          <strong class="detail-value">${Utils.formatPhone(cliente.telefone || '') || '—'}</strong>
+        </div>
+        <div class="detail-full">
+          <span class="detail-label">E-mail</span>
+          <strong class="detail-value">${cliente.email || '—'}</strong>
+        </div>
+        <div class="detail-full">
+          <span class="detail-label">Endereço</span>
+          <strong class="detail-value">${endereco || '—'}</strong>
+        </div>
+        <div class="detail-full">
+          <span class="detail-label">Pets</span>
+          ${
+            petsLista.length
+              ? `<ul class="detail-list">${petsLista.join('')}</ul>`
+              : '<strong class="detail-value">—</strong>'
+          }
+        </div>
+      </div>
+    `;
+  };
+
+  const toggleModalDetalhes = (open) => {
+    if (!modalDetalhes) return;
+    if (open) modalDetalhes.removeAttribute('hidden');
+    else modalDetalhes.setAttribute('hidden', 'hidden');
+  };
+
+  const carregarClienteParaVisualizacao = async (codigo) => {
+    try {
+      const resp = await fetch(`/api/clientes/${codigo}`);
+      if (!resp.ok) throw new Error('Cliente não encontrado.');
+      const cliente = await resp.json();
+      renderDetalhes(cliente);
+      toggleModalDetalhes(true);
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
+
   tableBody?.addEventListener('click', (event) => {
     const btn = event.target.closest('button[data-codigo]');
-    if (btn) {
-      event.preventDefault();
-      const codigo = btn.getAttribute('data-codigo');
+    if (!btn) return;
+    event.preventDefault();
+    const codigo = btn.getAttribute('data-codigo');
+    const action = btn.getAttribute('data-action');
+    if (action === 'view') {
+      carregarClienteParaVisualizacao(codigo);
+    } else {
       carregarClienteParaEdicao(codigo);
     }
   });
@@ -454,6 +548,13 @@
     const currentPets = collectPets();
     currentPets.push({});
     renderPets(currentPets);
+  });
+
+  btnFecharDetalhes?.addEventListener('click', () => toggleModalDetalhes(false));
+  modalDetalhes?.addEventListener('click', (event) => {
+    if (event.target === modalDetalhes) {
+      toggleModalDetalhes(false);
+    }
   });
 
   const toggleModalPet = (open) => {
