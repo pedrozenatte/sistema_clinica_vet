@@ -45,20 +45,11 @@
     if (!tableBody) return;
     const rows = data.map((cliente) => {
       const contato = Utils.formatPhone(cliente.telefone);
-      const petResumo = cliente.pets && cliente.pets.length
-        ? cliente.pets
-          .map((pet) => {
-            const detalhes = [pet.especie, pet.raca].filter(Boolean).join(' — ');
-            return `${pet.nome}${detalhes ? ` (${detalhes})` : ''}`;
-          })
-          .join(', ')
-        : '—';
       return `
         <tr data-codigo="${cliente.codigo}">
           <td>${cliente.codigo}</td>
           <td>${cliente.nome}</td>
           <td>${cliente.cpf || '—'}</td>
-          <td>${petResumo}</td>
           <td>${contato || '—'}</td>
           <td>${cliente.email || '—'}</td>
           <td>${cliente.cidade || '—'}</td>
