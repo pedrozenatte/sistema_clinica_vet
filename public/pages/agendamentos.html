@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Clínica Vet — Agendamentos</title>
-    <link rel="stylesheet" href="base.css" />
-    <link rel="stylesheet" href="agendamentos.css" />
+    <link rel="stylesheet" href="../styles/base.css" />
+    <link rel="stylesheet" href="../styles/agendamentos.css" />
   </head>
   <body>
     <aside class="sidenav">
@@ -187,35 +187,7 @@
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>21/09</td>
-                  <td>09:00</td>
-                  <td>Luna</td>
-                  <td>Mariana S.</td>
-                  <td>Vacinação</td>
-                  <td>Dra. Ana</td>
-                  <td><span class="badge badge-warning">Confirmar</span></td>
-                </tr>
-                <tr>
-                  <td>21/09</td>
-                  <td>10:00</td>
-                  <td>Thor</td>
-                  <td>Paulo H.</td>
-                  <td>Consulta</td>
-                  <td>Dr. Bruno</td>
-                  <td><span class="badge badge-success">Agendado</span></td>
-                </tr>
-                <tr>
-                  <td>21/09</td>
-                  <td>11:00</td>
-                  <td>Nina</td>
-                  <td>Carla T.</td>
-                  <td>Retorno</td>
-                  <td>Dra. Camila</td>
-                  <td><span class="badge badge-neutral">Aguardando</span></td>
-                </tr>
-              </tbody>
+              <tbody id="proximosBody"></tbody>
             </table>
           </div>
         </article>
@@ -238,15 +210,15 @@
           <div class="agenda-filters">
             <label class="field">
               <span>De</span>
-              <input type="date" />
+              <input id="agendaDataDe" type="date" />
             </label>
             <label class="field">
               <span>Até</span>
-              <input type="date" />
+              <input id="agendaDataAte" type="date" />
             </label>
             <label class="field">
               <span>Status</span>
-              <select>
+              <select id="agendaStatus">
                 <option value="">Todos</option>
                 <option>Programado</option>
                 <option>Confirmado</option>
@@ -256,7 +228,11 @@
             </label>
             <label class="field field-search">
               <span>Buscar</span>
-              <input type="search" placeholder="Pet, tutor, serviço, vet..." />
+              <input
+                id="agendaBusca"
+                type="search"
+                placeholder="Pet, tutor, serviço, vet..."
+              />
             </label>
           </div>
         </header>
@@ -275,48 +251,7 @@
                 <th>Contato</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>20/09/2025</td>
-                <td>09:00</td>
-                <td>Luna (Canina)</td>
-                <td>Mariana S.</td>
-                <td>Vacinação</td>
-                <td>Dra. Ana</td>
-                <td><span class="badge badge-info">Confirmado</span></td>
-                <td>(16) 9 8888-7777</td>
-              </tr>
-              <tr>
-                <td>20/09/2025</td>
-                <td>11:30</td>
-                <td>Thor (Felina)</td>
-                <td>Paulo H.</td>
-                <td>Consulta</td>
-                <td>Dr. Bruno</td>
-                <td><span class="badge badge-info">Confirmado</span></td>
-                <td>(16) 9 9999-0000</td>
-              </tr>
-              <tr>
-                <td>20/09/2025</td>
-                <td>14:00</td>
-                <td>Nina (Canina)</td>
-                <td>Carla T.</td>
-                <td>Retorno</td>
-                <td>Dra. Camila</td>
-                <td><span class="badge badge-success">Realizado</span></td>
-                <td>(16) 9 9999-8888</td>
-              </tr>
-              <tr>
-                <td>21/09/2025</td>
-                <td>10:15</td>
-                <td>Zeus (Aves)</td>
-                <td>Guilherme R.</td>
-                <td>Exames</td>
-                <td>Dra. Ana</td>
-                <td><span class="badge badge-danger">Cancelado</span></td>
-                <td>(16) 3333-2222</td>
-              </tr>
-            </tbody>
+            <tbody id="agendaBody"></tbody>
           </table>
         </div>
 
@@ -333,7 +268,7 @@
       </footer>
     </main>
 
-    <script src="utils.js"></script>
-    <script src="agendamentos.js"></script>
+    <script src="../scripts/utils.js"></script>
+    <script src="../scripts/agendamentos.js"></script>
   </body>
 </html>

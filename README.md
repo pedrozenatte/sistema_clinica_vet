@@ -120,4 +120,4 @@ http://localhost:3000
 ---
 
 ## 📸 Protótipo
-![screenshot do dashboard](./images/dashboard.png)  
+![screenshot do dashboard](./public/assets/images/dashboard.png)  

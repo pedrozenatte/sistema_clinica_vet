@@ -1,8 +1,4 @@
-# Dependências
-node_modules/
-
-# Sistema operacional
+node_modules
+.env
+npm-debug.log*
 .DS_Store
-
-# Ferramentas
-.stylelintrc.json

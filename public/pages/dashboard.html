@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Clínica Vet — Dashboard</title>
-    <link rel="stylesheet" href="base.css" />
-    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="stylesheet" href="../styles/base.css" />
+    <link rel="stylesheet" href="../styles/dashboard.css" />
   </head>
   <body>
     <aside class="sidenav" aria-label="Navegação lateral">
@@ -48,11 +48,11 @@
         <div class="filters">
           <label>
             Período
-            <select>
-              <option>Hoje</option>
-              <option>Últimos 7 dias</option>
-              <option>Este mês</option>
-              <option>Últimos 90 dias</option>
+            <select id="dashboardPeriodo">
+              <option value="1">Hoje</option>
+              <option value="7" selected>Últimos 7 dias</option>
+              <option value="30">Este mês</option>
+              <option value="90">Últimos 90 dias</option>
             </select>
           </label>
         </div>
@@ -62,25 +62,25 @@
       <section class="kpis">
         <article class="card kpi kpi-primary">
           <header>Atendimentos</header>
-          <div class="kpi-value">24</div>
+          <div class="kpi-value" id="kpiAtendimentos">--</div>
           <footer class="kpi-desc">Realizados no período</footer>
         </article>
 
         <article class="card kpi kpi-warning">
           <header>Média de Tempo</header>
-          <div class="kpi-value">59:32</div>
+          <div class="kpi-value" id="kpiMediaTempo">--</div>
           <footer class="kpi-desc">Duração média por atendimento</footer>
         </article>
 
         <article class="card kpi kpi-success">
           <header>% de Resolução</header>
-          <div class="kpi-value">50,0%</div>
+          <div class="kpi-value" id="kpiResolucao">--</div>
           <footer class="kpi-desc">Chamados resolvidos</footer>
         </article>
 
         <article class="card kpi kpi-danger">
           <header>% de Abandono</header>
-          <div class="kpi-value">12,5%</div>
+          <div class="kpi-value" id="kpiAbandono">--</div>
           <footer class="kpi-desc">Chamados cancelados/sem retorno</footer>
         </article>
       </section>
@@ -101,38 +101,7 @@
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>20/09 09:40</td>
-                  <td>Luna (Canina)</td>
-                  <td>Mariana S.</td>
-                  <td>Vacinação</td>
-                  <td><span class="badge badge-success">Resolvido</span></td>
-                </tr>
-                <tr>
-                  <td>20/09 11:15</td>
-                  <td>Thor (Felina)</td>
-                  <td>Paulo H.</td>
-                  <td>Consulta</td>
-                  <td>
-                    <span class="badge badge-warning">Em andamento</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>20/09 13:05</td>
-                  <td>Nina (Canina)</td>
-                  <td>Carla T.</td>
-                  <td>Retorno</td>
-                  <td><span class="badge badge-neutral">Pendente</span></td>
-                </tr>
-                <tr>
-                  <td>20/09 14:20</td>
-                  <td>Zeus (Aves)</td>
-                  <td>Guilherme R.</td>
-                  <td>Exames</td>
-                  <td><span class="badge badge-danger">Cancelado</span></td>
-                </tr>
-              </tbody>
+              <tbody id="ultimosAtendimentosBody"></tbody>
             </table>
           </div>
         </article>
@@ -140,37 +109,8 @@
         <!-- Status (donut) -->
         <article class="card chart-card">
           <header class="card-title">Status</header>
-          <div
-            class="donut"
-            style="
-              --d1: 50;
-              --d2: 17;
-              --d3: 20;
-              --d4: 13;
-              --c1: #22c55e;
-              --c2: #f59e0b;
-              --c3: #475569;
-              --c4: #ef4444;
-            "
-          ></div>
-          <ul class="legend">
-            <li>
-              <span class="dot" style="--dot: var(--green)"></span> Resolvido
-              (50%)
-            </li>
-            <li>
-              <span class="dot" style="--dot: var(--amber)"></span> Em andamento
-              (17%)
-            </li>
-            <li>
-              <span class="dot" style="--dot: var(--slate)"></span> Pendente
-              (20%)
-            </li>
-            <li>
-              <span class="dot" style="--dot: var(--danger)"></span> Cancelado
-              (13%)
-            </li>
-          </ul>
+          <div class="donut" id="statusDonut"></div>
+          <ul class="legend" id="statusLegend"></ul>
         </article>
       </section>
 
@@ -188,32 +128,7 @@
                   <th>Contato</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>19/09</td>
-                  <td>Amora (Canina)</td>
-                  <td>Letícia M.</td>
-                  <td>(19) 9 8888-7777</td>
-                </tr>
-                <tr>
-                  <td>18/09</td>
-                  <td>Frajola (Felina)</td>
-                  <td>Roberto D.</td>
-                  <td>(19) 9 9999-0000</td>
-                </tr>
-                <tr>
-                  <td>18/09</td>
-                  <td>Kiwi (Aves)</td>
-                  <td>Juliana P.</td>
-                  <td>juliana@email.com</td>
-                </tr>
-                <tr>
-                  <td>17/09</td>
-                  <td>Spike (Canina)</td>
-                  <td>Adriano G.</td>
-                  <td>(19) 3333-2222</td>
-                </tr>
-              </tbody>
+              <tbody id="ultimosCadastrosBody"></tbody>
             </table>
           </div>
         </article>
@@ -222,5 +137,8 @@
         <small>© Clínica Vet — painel demonstrativo. </small>
       </footer>
     </main>
+
+    <script src="../scripts/utils.js"></script>
+    <script src="../scripts/dashboard.js"></script>
   </body>
 </html>
