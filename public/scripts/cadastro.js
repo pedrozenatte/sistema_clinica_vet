@@ -472,6 +472,7 @@
     const codigo = extrairCodigoTutor(data.get('codigo') || '');
     const nome = (data.get('pet_nome') || '').trim();
     const especie = (data.get('pet_especie') || '').trim();
+    const raca = (data.get('pet_raca') || '').trim();
 
     const faltantes = [];
     if (!codigo) faltantes.push('Código do tutor');
@@ -490,7 +491,7 @@
       const resp = await fetch(`/api/clientes/${codigo}/pets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, especie }),
+        body: JSON.stringify({ nome, especie, raca }),
       });
       if (!resp.ok) {
         const info = await resp.json();

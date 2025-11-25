@@ -190,7 +190,7 @@ router.put('/:codigo', async (req, res) => {
 
 router.post('/:codigo/pets', async (req, res) => {
   const { codigo } = req.params;
-  const { nome, especie } = req.body || {};
+  const { nome, especie, raca } = req.body || {};
 
   if (!nome || !especie) {
     return res.status(400).json({ error: 'Campos obrigatórios: nome, especie.' });
@@ -206,10 +206,13 @@ router.post('/:codigo/pets', async (req, res) => {
     return res.status(404).json({ error: `Cliente ${codigo} não encontrado.` });
   }
 
+  const payload = { nome, especie, cliente_id: cliente.id };
+  if (raca) payload.raca = raca;
+
   const { data, error } = await supabase
     .from('pets')
-    .insert({ nome, especie, cliente_id: cliente.id })
-    .select('id,nome,especie,cliente_id')
+    .insert(payload)
+    .select('id,nome,especie,raca,cliente_id')
     .single();
 
   if (error) {
