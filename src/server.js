@@ -33,7 +33,7 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'Endpoint não encontrado.' });
   }
-  return res.sendFile(path.join(publicDir, 'pages', 'dashboard.html'));
+  return res.redirect('/pages/dashboard.html');
 });
 
 app.listen(PORT, () => {

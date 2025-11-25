@@ -35,6 +35,15 @@ const parseDurationToMinutes = (value) => {
   return null;
 };
 
+const handleMissing = (result) => {
+  if (!result || !result.error) return result;
+  const message = result.error.message || '';
+  if (/does not exist|relation|undefined_table|column/.test(message)) {
+    return { data: [], count: 0 };
+  }
+  throw result.error;
+};
+
 router.get('/', async (req, res) => {
   const days = clampDays(req.query.days);
   const now = new Date();
@@ -68,35 +77,25 @@ router.get('/', async (req, res) => {
         .limit(4),
     ]);
 
+    const agendamentosData = handleMissing(agendamentosRes).data || [];
+    const atendimentosCountData = handleMissing(atendimentosCountRes);
+    const ultimosAtendimentosData = handleMissing(ultimosAtendimentosRes).data || [];
+
     // Fallback para clientes caso created_at não exista
-    let ultimosClientesData = ultimosClientesRes.data;
-    if (ultimosClientesRes.error && /created_at/.test(ultimosClientesRes.error.message)) {
+    let ultimosClientesData = handleMissing(ultimosClientesRes).data || [];
+    if ((ultimosClientesRes.error && /created_at/.test(ultimosClientesRes.error.message)) || !ultimosClientesData.length) {
       const fallback = await supabase
         .from('clientes')
         .select('codigo,nome,telefone,pets ( nome, especie )')
         .order('codigo', { ascending: false })
         .limit(4);
-      if (fallback.error) {
-        return res.status(500).json({ error: fallback.error.message });
+      const fallbackData = handleMissing(fallback).data || [];
+      if (fallbackData.length) {
+        ultimosClientesData = fallbackData;
       }
-      ultimosClientesData = fallback.data;
-    } else if (ultimosClientesRes.error) {
-      return res.status(500).json({ error: ultimosClientesRes.error.message });
     }
 
-    if (agendamentosRes.error) {
-      return res.status(500).json({ error: agendamentosRes.error.message });
-    }
-
-    if (atendimentosCountRes.error) {
-      return res.status(500).json({ error: atendimentosCountRes.error.message });
-    }
-
-    if (ultimosAtendimentosRes.error) {
-      return res.status(500).json({ error: ultimosAtendimentosRes.error.message });
-    }
-
-    const agendamentos = agendamentosRes.data || [];
+    const agendamentos = agendamentosData;
     const durations = agendamentos
       .map((item) => parseDurationToMinutes(item.duracao))
       .filter((value) => typeof value === 'number' && value > 0);
@@ -127,13 +126,13 @@ router.get('/', async (req, res) => {
         days,
       },
       kpis: {
-        atendimentos: atendimentosCountRes.count || 0,
+        atendimentos: atendimentosCountData.count || 0,
         mediaDuracaoMin: avgDuration,
         resolucaoPerc: Number.isFinite(resolucaoPerc) ? resolucaoPerc : 0,
         abandonoPerc: Number.isFinite(abandonoPerc) ? abandonoPerc : 0,
       },
       statusBuckets,
-      ultimosAtendimentos: (ultimosAtendimentosRes.data || []).map((item) => ({
+      ultimosAtendimentos: (ultimosAtendimentosData || []).map((item) => ({
         data: item.data,
         hora: item.hora,
         pet: item.pet_nome,

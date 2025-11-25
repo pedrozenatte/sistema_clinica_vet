@@ -14,23 +14,23 @@
         <div class="brand-name"><strong>CLÍNICA</strong><span>VET</span></div>
       </div>
       <nav class="sidenav-nav">
-        <a href="dashboard.html" class="nav-item" title="Início">
+        <a href="/pages/dashboard.html" class="nav-item" title="Início">
           <span class="ico">🏠</span><span class="label">Início</span>
         </a>
         <!-- Aba ativa na sidebar -->
-        <a href="cadastro.html" class="nav-item active" title="Cadastros">
+        <a href="/pages/cadastro.html" class="nav-item active" title="Cadastros">
           <span class="ico">📝</span><span class="label">Cadastros</span>
         </a>
-        <a href="agendamentos.html" class="nav-item" title="Agendamentos">
+        <a href="/pages/agendamentos.html" class="nav-item" title="Agendamentos">
           <span class="ico">🗓️</span><span class="label">Agendamentos</span>
         </a>
-        <a href="atendimentos.html" class="nav-item" title="Atendimentos">
+        <a href="/pages/atendimentos.html" class="nav-item" title="Atendimentos">
           <span class="ico">💉</span><span class="label">Atendimentos</span>
         </a>
-        <a href="internacao.html" class="nav-item" title="Internação">
+        <a href="/pages/internacao.html" class="nav-item" title="Internação">
           <span class="ico">🏥</span><span class="label">Internação</span>
         </a>
-        <a href="prontuario.html" class="nav-item" title="Prontuários">
+        <a href="/pages/prontuario.html" class="nav-item" title="Prontuários">
           <span class="ico">📋</span><span class="label">Prontuários</span>
         </a>
       </nav>
@@ -48,30 +48,18 @@
           <input type="text" id="inputBuscaRapida" placeholder="Buscar por código..." style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 200px;" />
           <button class="btn btn-ghost" onclick="buscarClientePorCodigoRapido()">Buscar</button>
           <button class="btn btn-danger" onclick="deletarClientePorCodigo()" style="margin-left: 10px;">Deletar por Código</button>
-          <button class="btn btn-ghost">Novo</button>
-          <button class="btn btn-primary">Salvar</button>
+          <button class="btn btn-ghost" type="reset" form="formCadastro">Novo</button>
+          <button class="btn btn-primary" type="button" id="btnSalvarCadastro">
+            Salvar
+          </button>
         </div>
       </header>
 
-      <form class="form" autocomplete="on">
+      <form class="form" id="formCadastro" autocomplete="on">
         <!-- DADOS DO TUTOR -->
         <fieldset class="card">
           <legend>Dados do Tutor</legend>
           <div class="grid g-3">
-            <label class="field">
-              <span>Código</span>
-              <input type="text" name="codigo" inputmode="numeric" placeholder="00000" />
-            </label>
-
-            <label class="field">
-              <span>Situação</span>
-              <select name="situacao">
-                <option>Liberado</option>
-                <option>Inativo</option>
-                <option>Bloqueado</option>
-              </select>
-            </label>
-
             <label class="field field-wide">
               <span>Nome completo</span>
               <input type="text" name="nome" placeholder="Ex.: João da Silva" />
@@ -117,10 +105,6 @@
               </select>
             </label>
 
-            <label class="check">
-              <input type="checkbox" />
-              <span>Cliente desativado</span>
-            </label>
           </div>
         </fieldset>
 
@@ -180,10 +164,6 @@
             <label class="field">
               <span>Telefone</span>
               <input type="tel" name="telefone" placeholder="(00) 0000-0000" />
-            </label>
-            <label class="field">
-              <span>Celular</span>
-              <input type="tel" name="celular" placeholder="(00) 00000-0000" />
             </label>
             <label class="field field-wide">
               <span>E-mail</span>

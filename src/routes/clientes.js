@@ -1,8 +1,10 @@
 import { Router } from 'express';
+import { randomUUID } from 'node:crypto';
 import { supabase } from '../lib/supabaseClient.js';
 
 const router = Router();
 const baseSelect = 'id,codigo,nome,cpf,email,telefone,situacao,pets ( id,nome,especie )';
+const generateCodigo = () => `CLI-${randomUUID().split('-')[0].toUpperCase()}`;
 
 const sanitizePattern = (value = '') => `%${value}%`.replace(/,/g, '');
 
@@ -47,13 +49,15 @@ router.get('/:codigo', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const { pet, ...cliente } = req.body;
-  if (!cliente.codigo || !cliente.nome) {
-    return res.status(400).json({ error: 'Campos "codigo" e "nome" são obrigatórios.' });
+  if (!cliente.nome) {
+    return res.status(400).json({ error: 'Campo "nome" é obrigatório.' });
   }
+
+  const codigo = (cliente.codigo || '').trim() || generateCodigo();
 
   const { data, error } = await supabase
     .from('clientes')
-    .insert({ ...cliente })
+    .insert({ ...cliente, codigo })
     .select()
     .single();
 
