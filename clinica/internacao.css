@@ -1,189 +1,35 @@
-/* ---------- Tema comum ---------- */
 :root {
-  --bg-1: #0b1220;
-  --bg-2: #0f172a;
-  --card: #0f1b33;
-  --card-2: #132142;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
-  --border: #1f2a44;
-  --primary: #1d4ed8;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --radius: 14px;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-
-  /* cores por medicamento (pode padronizar por classe) */
-  --rx-a: #3b82f6; /* Amoxicilina */
-  --rx-b: #f59e0b; /* Dipirona */
-  --rx-c: #22c55e; /* Soro */
-  --rx-d: #a855f7; /* Antiemético */
-  --rx-e: #ef4444; /* Antibiótico IV */
-}
-
-* {
-  box-sizing: border-box;
+  --rx-a: #3b82f6;
+  --rx-b: #f59e0b;
+  --rx-c: #22c55e;
+  --rx-d: #a855f7;
+  --rx-e: #ef4444;
 }
 
 html,
 body {
-  height: 100%;
   width: 100%;
   overflow-x: hidden;
 }
 
-body {
-  margin: 0;
-  color: var(--text);
-  background: linear-gradient(
-    135deg,
-    var(--bg-1),
-    var(--bg-2) 40%,
-    var(--bg-1)
-  );
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
-    Cantarell, "Helvetica Neue", Arial, "Noto Sans";
-  display: grid;
-  grid-template-columns: 260px 1fr;
-}
-
-
-/* Sidebar */
-.sidenav {
-  border-right: 1px solid var(--border);
-  padding: 24px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(6px);
-}
-
-.sidenav-nav {
-  display: grid;
-  gap: 6px;
-}
-
-.sidenav-nav a {
-  text-decoration: none;
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 10px;
-  gap: 10px;
-  display: flex;
-}
-
-.sidenav-nav a:hover {
-  background: #111827;
-}
-
-.sidenav-nav a.active {
-  background: #1f2937;
-  border: 1px solid #374151;
-}
-
-.sidenav-nav .ico {
-  width: 24px;
-  display: grid;
-  place-items: center;
-}
-
-.sidenav-nav .label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.brand-logo {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  background: #111827;
-  border-radius: 12px;
-}
-
-.brand-name strong {
-  display: block;
-  letter-spacing: 0.04em;
-}
-
-.brand-name span {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* Página */
-.page {
-  padding: 24px;
-  display: grid;
-  gap: 18px;
-}
-
 .topbar {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
-  flex-wrap: wrap; 
 }
 
 .topbar > div:first-child {
   min-width: 0;
 }
 
-.topbar h1 {
-  margin: 0;
-  font-size: 22px;
-}
-
-.muted {
-  color: var(--muted);
-}
-
-.small {
-  font-size: 12px;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
 .filter {
-  display: grid;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--muted);
   white-space: nowrap;
 }
 
 .filter input,
 .filter select {
-  background: #0b1220;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 10px;
   width: auto;
   max-width: 100%;
-}
-
-/* Cards */
-.card {
-  background: linear-gradient(180deg, var(--card), var(--card-2));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 16px;
 }
 
 .legend {
@@ -204,7 +50,7 @@ body {
 
 .pill.rx-a {
   background: var(--rx-a);
-  color: white;
+  color: #fff;
 }
 
 .pill.rx-b {
@@ -219,21 +65,24 @@ body {
 
 .pill.rx-d {
   background: var(--rx-d);
-  color: white;
+  color: #fff;
 }
 
 .pill.rx-e {
   background: var(--rx-e);
-  color: white;
+  color: #fff;
 }
 
-/* Tabela de horas */
+.table-card {
+  padding: 12px;
+  overflow: hidden;
+}
+
 .table-wrapper {
   max-width: 100%;
-  overflow: auto;
-  overflow-x: auto; /* rolagem horizontal só aqui */
+  overflow-x: auto;
   overflow-y: hidden;
-  -webkit-overflow-scrolling: touch; /* suaviza no iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
 .hour-grid {
@@ -258,9 +107,6 @@ body {
   z-index: 5;
   background: #111a33;
   color: #cbd5e1;
-  font-size: 12px;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
 }
 
 .hour-grid th.sticky-col {
@@ -269,7 +115,7 @@ body {
   z-index: 6;
   background: #0e1a33;
   text-align: left;
-  min-width: clamp(160px, 28vw, 240px); /* 1ª coluna responsiva */
+  min-width: clamp(160px, 28vw, 240px);
 }
 
 .hour-grid tbody tr:nth-child(odd) th.sticky-col {
@@ -280,7 +126,6 @@ body {
   background: #0c1630;
 }
 
-/* Células medicadas (cores/efeitos) */
 .hour-grid td.rx-a {
   background: color-mix(in srgb, var(--rx-a) 30%, transparent);
   box-shadow: inset 0 0 0 2px var(--rx-a);
@@ -315,46 +160,12 @@ body {
   cursor: help;
 }
 
-/* Rodapé e responsivo */
-.footer {
-  color: var(--muted);
-  text-align: center;
-  padding: 6px 0 12px;
-  font-size: 12px;
-}
-
-/* --- COLAPSA A LATERAL A PARTIR DE 1200px --- */
-@media (max-width: 1200px) {
-  body {
-    grid-template-columns: 72px 1fr;
-  }
-
-  .sidenav {
-    width: 72px;
-    padding: 12px 8px;
-    overflow-x: hidden;
-  }
-
-  .brand-name {
-    display: none;
-  }
-  
-  .sidenav-nav a {
-    justify-content: center;
-    gap: 0;
-  }
-
-  .sidenav-nav .label {
-    display: none;
-  }
-}
-
 @media (max-width: 640px) {
   .topbar {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .actions {
     width: 100%;
   }
@@ -368,12 +179,6 @@ body {
     width: 100%;
   }
 }
-
-/* -------- Cartão da tabela e área rolável -------- */
-.table-card {
-  padding: 12px;
-  overflow: hidden;
-} 
 
 .table-wrapper::-webkit-scrollbar {
   height: 10px;

@@ -1,399 +1,3 @@
-/* ---------- Tema comum ---------- */
-:root {
-  --bg-1: #0b1220;
-  --bg-2: #0f172a;
-  --card: #0f1b33;
-  --card-2: #132142;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
-  --border: #1f2a44;
-  --primary: #1d4ed8;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --radius: 14px;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-
-  /* cores por medicamento (pode padronizar por classe) */
-  --rx-a: #3b82f6; /* Amoxicilina */
-  --rx-b: #f59e0b; /* Dipirona */
-  --rx-c: #22c55e; /* Soro */
-  --rx-d: #a855f7; /* Antiemético */
-  --rx-e: #ef4444; /* Antibiótico IV */
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-body {
-  margin: 0;
-  color: var(--text);
-  background: linear-gradient(
-    135deg,
-    var(--bg-1),
-    var(--bg-2) 40%,
-    var(--bg-1)
-  );
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
-    Cantarell, "Helvetica Neue", Arial, "Noto Sans";
-  display: grid;
-  grid-template-columns: 260px 1fr;
-}
-
-
-/* Sidebar */
-.sidenav {
-  border-right: 1px solid var(--border);
-  padding: 24px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(6px);
-}
-
-.sidenav-nav {
-  display: grid;
-  gap: 6px;
-}
-
-.sidenav-nav a {
-  text-decoration: none;
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 10px;
-  gap: 10px;
-  display: flex;
-}
-
-.sidenav-nav a:hover {
-  background: #111827;
-}
-
-.sidenav-nav a.active {
-  background: #1f2937;
-  border: 1px solid #374151;
-}
-
-.sidenav-nav .ico {
-  width: 24px;
-  display: grid;
-  place-items: center;
-}
-
-.sidenav-nav .label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.brand-logo {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  background: #111827;
-  border-radius: 12px;
-}
-
-.brand-name strong {
-  display: block;
-  letter-spacing: 0.04em;
-}
-
-.brand-name span {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* Página */
-.page {
-  padding: 24px;
-  display: grid;
-  gap: 18px;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap; 
-}
-
-.topbar > div:first-child {
-  min-width: 0;
-}
-
-.topbar h1 {
-  margin: 0;
-  font-size: 22px;
-}
-
-.muted {
-  color: var(--muted);
-}
-
-.small {
-  font-size: 12px;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.filter {
-  display: grid;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.filter input,
-.filter select {
-  background: #0b1220;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 10px;
-  width: auto;
-  max-width: 100%;
-}
-
-/* Cards */
-.card {
-  background: linear-gradient(180deg, var(--card), var(--card-2));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 16px;
-}
-
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-.pill {
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  color: #0b1220;
-  background: #e5e7eb;
-}
-
-.pill.rx-a {
-  background: var(--rx-a);
-  color: white;
-}
-
-.pill.rx-b {
-  background: var(--rx-b);
-  color: #1f1300;
-}
-
-.pill.rx-c {
-  background: var(--rx-c);
-  color: #051b0d;
-}
-
-.pill.rx-d {
-  background: var(--rx-d);
-  color: white;
-}
-
-.pill.rx-e {
-  background: var(--rx-e);
-  color: white;
-}
-
-/* Tabela de horas */
-.table-wrapper {
-  max-width: 100%;
-  overflow: auto;
-  overflow-x: auto; /* rolagem horizontal só aqui */
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch; /* suaviza no iOS */
-}
-
-.hour-grid {
-  width: max-content;
-  border-collapse: separate;
-  border-spacing: 0;
-  min-width: 100%;
-}
-
-.hour-grid th,
-.hour-grid td {
-  min-width: clamp(44px, 5.2vw, 56px);
-  padding: clamp(6px, 1.2vw, 10px);
-  text-align: center;
-  border-right: 1px solid #17223e;
-  border-bottom: 1px solid #17223e;
-}
-
-.hour-grid thead th {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background: #111a33;
-  color: #cbd5e1;
-  font-size: 12px;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
-}
-
-.hour-grid th.sticky-col {
-  position: sticky;
-  left: 0;
-  z-index: 6;
-  background: #0e1a33;
-  text-align: left;
-  min-width: clamp(160px, 28vw, 240px); /* 1ª coluna responsiva */
-}
-
-.hour-grid tbody tr:nth-child(odd) th.sticky-col {
-  background: #0c1630;
-}
-
-.hour-grid tbody tr:hover td {
-  background: #0c1630;
-}
-
-/* Células medicadas (cores/efeitos) */
-.hour-grid td.rx-a {
-  background: color-mix(in srgb, var(--rx-a) 30%, transparent);
-  box-shadow: inset 0 0 0 2px var(--rx-a);
-}
-
-.hour-grid td.rx-b {
-  background: color-mix(in srgb, var(--rx-b) 30%, transparent);
-  box-shadow: inset 0 0 0 2px var(--rx-b);
-}
-
-.hour-grid td.rx-c {
-  background: color-mix(in srgb, var(--rx-c) 30%, transparent);
-  box-shadow: inset 0 0 0 2px var(--rx-c);
-}
-
-.hour-grid td.rx-d {
-  background: color-mix(in srgb, var(--rx-d) 30%, transparent);
-  box-shadow: inset 0 0 0 2px var(--rx-d);
-}
-
-.hour-grid td.rx-e {
-  background: color-mix(in srgb, var(--rx-e) 30%, transparent);
-  box-shadow: inset 0 0 0 2px var(--rx-e);
-}
-
-.hour-grid td.rx-a:hover,
-.hour-grid td.rx-b:hover,
-.hour-grid td.rx-c:hover,
-.hour-grid td.rx-d:hover,
-.hour-grid td.rx-e:hover {
-  filter: brightness(1.15);
-  cursor: help;
-}
-
-/* Rodapé e responsivo */
-.footer {
-  color: var(--muted);
-  text-align: center;
-  padding: 6px 0 12px;
-  font-size: 12px;
-}
-
-/* --- COLAPSA A LATERAL A PARTIR DE 1200px --- */
-@media (max-width: 1200px) {
-  body {
-    grid-template-columns: 72px 1fr;
-  }
-
-  .sidenav {
-    width: 72px;
-    padding: 12px 8px;
-    overflow-x: hidden;
-  }
-
-  .brand-name {
-    display: none;
-  }
-  
-  .sidenav-nav a {
-    justify-content: center;
-    gap: 0;
-  }
-
-  .sidenav-nav .label {
-    display: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .topbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .actions {
-    width: 100%;
-  }
-
-  .filter {
-    flex: 1;
-  }
-
-  .filter input,
-  .filter select {
-    width: 100%;
-  }
-}
-
-/* -------- Cartão da tabela e área rolável -------- */
-.table-card {
-  padding: 12px;
-  overflow: hidden;
-} 
-
-.table-wrapper::-webkit-scrollbar {
-  height: 10px;
-}
-
-.table-wrapper::-webkit-scrollbar-thumb {
-  background: #1f2937;
-  border-radius: 999px;
-  border: 2px solid #0b1220;
-}
-
-.table-wrapper::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Daqui para cima é = internacao.css */
-
-/* Página de Prontuário – usa as mesmas variáveis de internacao.css */
-
-/* ===== Topbar com avatar ===== */
 .prontuario .prontuario-topbar {
   align-items: center;
   gap: 16px;
@@ -415,7 +19,7 @@ body {
   border-radius: 12px;
   background: #111827;
   border: 1px solid var(--border);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25) inset;
+  box-shadow: inset 0 6px 14px rgba(0, 0, 0, 0.25);
 }
 
 .patient-head .meta h1 {
@@ -427,52 +31,26 @@ body {
   margin: 4px 0 0;
 }
 
-/* Botões de ação */
-.btn {
+.prontuario .btn {
   appearance: none;
-  border: 1px solid var(--border);
-  background: #0b1220;
-  color: var(--text);
   padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
 }
 
-.btn:hover {
-  background: #111827;
-}
-
-.btn:active {
-  transform: translateY(1px);
-}
-
-.btn-primary {
+.prontuario .btn-primary {
   border-color: #1e3a8a;
   background: linear-gradient(180deg, #1d4ed8, #1e40af);
   color: #fff;
 }
 
-.btn-primary:hover {
-  filter: brightness(1.05);
-}
-
-.btn-danger {
+.prontuario .btn-danger {
   border-color: #7f1d1d;
   background: linear-gradient(180deg, #ef4444, #b91c1c);
   color: #fff;
 }
 
-.btn-danger:hover {
-  filter: brightness(1.05);
-}
-
-/* ===== Grid de cartões ===== */
-.grid {
+.grid-2 {
   display: grid;
   gap: 18px;
-}
-
-.grid-2 {
   grid-template-columns: 1.1fr 1fr;
 }
 
@@ -482,14 +60,12 @@ body {
   }
 }
 
-/* Título dos cartões */
 .card-title {
   margin: 0 0 12px;
   font-size: 16px;
   letter-spacing: 0.02em;
 }
 
-/* Key/Value compacto (Resumo) */
 .kv {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -511,19 +87,11 @@ body {
   font-weight: 600;
 }
 
-.badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 12px;
-}
-
 .badge-ok {
   background: color-mix(in srgb, var(--success) 25%, transparent);
   color: #d1fae5;
 }
 
-/* Sinais vitais – cards pequenos */
 .vitals {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -562,7 +130,6 @@ body {
   }
 }
 
-/* Chips (alergias) */
 .chips {
   list-style: none;
   padding: 0;
@@ -591,22 +158,22 @@ body {
   overflow: auto;
 }
 
-.table {
+.meds-table {
   width: max-content;
   min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
 }
 
-.table th,
-.table td {
+.meds-table th,
+.meds-table td {
   border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
   padding: 10px;
-  white-space: nowrap; /* não quebra palavras em colunas estreitas */
+  white-space: nowrap;
 }
 
-.table thead th {
+.meds-table thead th {
   position: sticky;
   top: 0;
   z-index: 3;
@@ -615,11 +182,10 @@ body {
   font-size: 12px;
 }
 
-.table tbody tr:nth-child(odd) td {
+.meds-table tbody tr:nth-child(odd) td {
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* Timeline */
 .timeline-list {
   list-style: none;
   margin: 0;
@@ -627,7 +193,7 @@ body {
   display: grid;
   gap: 12px;
   max-height: 340px;
-  overflow: auto; 
+  overflow: auto;
 }
 
 .timeline-list li {
@@ -658,13 +224,4 @@ body {
   .timeline .t-meta {
     text-align: left;
   }
-}
-
-/* Pequenos polimentos de responsividade geral */
-.prontuario .page {
-  gap: 18px;
-}
-
-.prontuario .topbar {
-  flex-wrap: wrap;
 }
