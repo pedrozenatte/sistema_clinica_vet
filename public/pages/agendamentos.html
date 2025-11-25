@@ -45,12 +45,11 @@
           </p>
         </div>
         <div class="actions">
-          <button class="btn btn-ghost">Novo</button>
-          <button class="btn btn-primary">Salvar</button>
+          <button id="btnNovoAgendamento" class="btn btn-primary">Novo Agendamento</button>
         </div>
       </header>
 
-      <form class="card form" autocomplete="on">
+      <form id="formAgendamentoWrapper" class="card form form-hidden" autocomplete="on">
         <h2 class="card-title">Novo Agendamento</h2>
 
         <div class="grid g-4">
@@ -89,12 +88,7 @@
 
           <label class="field">
             <span>Veterinário</span>
-            <select name="veterinario">
-              <option>Dra. Ana</option>
-              <option>Dr. Bruno</option>
-              <option>Dra. Camila</option>
-              <option>Dra. Estefany</option>
-            </select>
+            <input type="text" name="veterinario" placeholder="Ex.: Dra. Ana" />
           </label>
 
           <label class="field">
@@ -137,7 +131,6 @@
             <span>Status</span>
             <select name="status">
               <option>Agendado</option>
-              <option>Confirmado</option>
               <option>Cancelado</option>
               <option>Compareceu</option>
               <option>Faltou</option>
@@ -221,12 +214,11 @@
             <label class="field">
               <span>Status</span>
               <select id="agendaStatus">
-                <option value="">Todos</option>
-                <option>Programado</option>
-                <option>Confirmado</option>
-                <option>Realizado</option>
-                <option>Cancelado</option>
-              </select>
+                              <option value="">Todos</option>
+                              <option>Agendado</option>
+                              <option>Cancelado</option>
+                              <option>Compareceu</option>
+                              <option>Faltou</option>              </select>
             </label>
             <label class="field field-search">
               <span>Buscar</span>
@@ -251,6 +243,7 @@
                 <th>Veterinário</th>
                 <th>Status</th>
                 <th>Contato</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody id="agendaBody"></tbody>
@@ -272,5 +265,16 @@
 
     <script src="../scripts/utils.js"></script>
     <script src="../scripts/agendamentos.js"></script>
+
+    <!-- Modal de detalhes do agendamento -->
+    <div class="modal-backdrop" id="modalDetalhes" hidden>
+      <div class="modal">
+        <header class="modal__header">
+          <h2 id="detalhesTitulo">Detalhes do Agendamento</h2>
+          <button class="btn btn-ghost" id="btnFecharDetalhes">Fechar</button>
+        </header>
+        <div class="modal__body" id="detalhesBody"></div>
+      </div>
+    </div>
   </body>
 </html>

@@ -22,8 +22,8 @@
   };
 
   const formatTime = (value, opts = {}) => {
-    if (typeof value === "string" && /^\\d{2}:\\d{2}$/.test(value)) {
-      return value;
+    if (typeof value === "string" && /^\\d{2}:\\d{2}(:\\d{2})?$/.test(value)) {
+      return value.substring(0, 5);
     }
     const date = toDate(value);
     if (!date) return "--";

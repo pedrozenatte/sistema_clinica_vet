@@ -63,6 +63,28 @@ router.post('/', async (req, res) => {
   res.status(201).json(data);
 });
 
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const payload = req.body;
+  
+  // Remove campos que não devem ser atualizados diretamente ou que são PK
+  delete payload.id;
+  delete payload.created_at;
+
+  const { data, error } = await supabase
+    .from('agendamentos')
+    .update(payload)
+    .eq('id', id)
+    .select(selectFields)
+    .single();
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  res.json(data);
+});
+
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   const { data, error } = await supabase
