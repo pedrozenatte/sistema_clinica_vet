@@ -64,14 +64,6 @@
             </label>
 
             <label class="field">
-              <span>Pessoa</span>
-              <select name="tipo_pessoa">
-                <option>Física</option>
-                <option>Jurídica</option>
-              </select>
-            </label>
-
-            <label class="field">
               <span>Situação</span>
               <select name="situacao">
                 <option>Liberado</option>
@@ -106,13 +98,13 @@
           <legend>Documentos</legend>
           <div class="grid g-3">
             <label class="field">
-              <span>CPF / CNPJ</span>
-              <input type="text" name="cpf_cnpj" placeholder="000.000.000-00" />
+              <span>CPF</span>
+              <input type="text" name="cpf" placeholder="000.000.000-00" />
             </label>
 
             <label class="field">
-              <span>RG / IE</span>
-              <input type="text" name="rg_ie" placeholder="Documento" />
+              <span>RG</span>
+              <input type="text" name="rg" placeholder="Documento" />
             </label>
 
             <label class="field">
@@ -125,19 +117,9 @@
               </select>
             </label>
 
-            <label class="field">
-              <span>Estado</span>
-              <input type="text" name="estado_numero" inputmode="numeric" placeholder="35" />
-            </label>
-
             <label class="check">
               <input type="checkbox" />
-              <span>Consulta CNPJ</span>
-            </label>
-
-            <label class="check">
-              <input type="checkbox" />
-              <span>Inativo</span>
+              <span>Cliente desativado</span>
             </label>
           </div>
         </fieldset>
@@ -281,19 +263,23 @@
         </div>
       </form>
 
+      <aside class="form-save-bar" aria-live="polite">
+        <div class="form-save-bar__content">
+          <div>
+            <strong>Finalizou o cadastro?</strong>
+            <p class="muted small">Revise os dados e confirme o cadastro.</p>
+          </div>
+          <div class="form-save-bar__actions">
+            <button class="btn btn-primary">Salvar cadastro</button>
+          </div>
+        </div>
+      </aside>
+
       <!-- LISTA DE PESSOAS CADASTRADAS -->
       <section class="card" id="lista-cadastros">
         <header class="list-header">
           <h2 class="card-title">Pessoas Cadastradas</h2>
           <div class="list-filters">
-            <label class="field">
-              <span>Tipo</span>
-              <select id="fTipo">
-                <option value="">Todos</option>
-                <option value="Física">Física</option>
-                <option value="Jurídica">Jurídica</option>
-              </select>
-            </label>
             <label class="field">
               <span>Situação</span>
               <select id="fSituacao">
@@ -307,7 +293,7 @@
               <input
                 id="fBusca"
                 type="search"
-                placeholder="Nome, CPF/CNPJ, e-mail, cidade..."
+                placeholder="Nome, CPF, e-mail, cidade..."
               />
             </label>
           </div>
@@ -322,8 +308,7 @@
               <tr>
                 <th>Código</th>
                 <th>Nome</th>
-                <th>Tipo</th>
-                <th>CPF/CNPJ</th>
+                <th>CPF</th>
                 <th>Pet</th>
                 <th>Contato</th>
                 <th>E-mail</th>

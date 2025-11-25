@@ -1,10 +1,10 @@
 .form .grid {
-  gap: 14px;
+  gap: 16px;
 }
 
 .grid-lists {
   display: grid;
-  gap: 18px;
+  gap: 22px;
   grid-template-columns: 2fr 1fr;
 }
 
@@ -17,9 +17,10 @@
 
 .form-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
   grid-column: 1 / -1;
+  padding-top: 12px;
 }
 
 .form-actions .spacer {
@@ -27,30 +28,39 @@
 }
 
 .table-wrapper table {
-  min-width: 640px;
+  min-width: 680px;
 }
 
 .reminders {
   margin: 0;
   padding-left: 18px;
   color: #cbd5e1;
+  display: grid;
+  gap: 6px;
 }
 
 .reminders li {
-  margin: 6px 0;
+  margin: 0;
 }
 
 .agenda-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 16px;
+  gap: 18px;
   flex-wrap: wrap;
+}
+
+.agenda-header .tagline {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
 }
 
 .agenda-filters {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   grid-template-columns: repeat(4, minmax(180px, 1fr));
 }
 
@@ -71,18 +81,23 @@
 }
 
 .agenda-table {
-  min-width: 860px;
+  min-width: 880px;
 }
 
 .agenda-table th {
-  background: #111a33;
+  background: rgba(13, 20, 50, 0.85);
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+}
+
+.agenda-table tbody tr:hover {
+  background: rgba(236, 72, 153, 0.08);
 }
 
 .badge-info {
-  background: rgba(59, 130, 246, 0.12);
+  background: rgba(59, 130, 246, 0.16);
   color: #bfdbfe;
-  border-color: #1e40af;
+  border-color: rgba(59, 130, 246, 0.4);
 }
