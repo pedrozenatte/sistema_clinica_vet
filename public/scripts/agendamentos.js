@@ -7,7 +7,15 @@
   const filtroBusca = document.getElementById('agendaBusca');
   const formAgendamento = document.querySelector('form.card.form');
 
-  const agendamentos = [];
+  // Elements for Auto-complete
+  const inputTutor = formAgendamento?.querySelector('[name="tutor"]');
+  const listTutores = document.getElementById('listTutores');
+  const inputPet = formAgendamento?.querySelector('[name="pet"]');
+  const listPets = document.getElementById('listPets');
+  const inputEspecie = formAgendamento?.querySelector('[name="especie"]');
+
+  let agendamentos = [];
+  let clientesData = []; // Stores full client objects with pets
 
   const badgeClass = (status) => {
     const map = {
@@ -27,6 +35,7 @@
     const agora = new Date();
     const proximos = agendamentos
       .filter((item) => {
+        // If it is explicitly marked as 'destaque' OR it is in the future
         if (item.destaque) return true;
         const dataHora = new Date(`${item.data}T${item.hora}`);
         return dataHora >= agora && item.status !== 'Cancelado';
@@ -98,6 +107,8 @@
 
   const carregarAgendamentos = async () => {
     try {
+      // Fetching all and filtering client-side to ensure responsiveness
+      // (Can be optimized to server-side filter if data grows large)
       const params = new URLSearchParams();
       const resp = await fetch(`/api/agendamentos?${params.toString()}`);
       if (!resp.ok) throw new Error('Falha ao obter agendamentos.');
@@ -111,6 +122,77 @@
     }
   };
 
+  // --- Client/Pet Selection Logic ---
+
+  const carregarClientes = async () => {
+    try {
+      const resp = await fetch('/api/clientes');
+      if (!resp.ok) throw new Error('Falha ao carregar clientes.');
+      clientesData = await resp.json();
+      
+      // Populate Tutor List
+      if (listTutores) {
+        listTutores.innerHTML = clientesData
+          .map(c => `<option value="${c.nome}">${c.cpf ? `CPF: ${c.cpf}` : ''}</option>`)
+          .join('');
+      }
+    } catch (error) {
+      console.error('Erro carregando clientes para o select:', error);
+    }
+  };
+
+  const getSelectedClient = () => {
+    const name = inputTutor?.value;
+    return clientesData.find(c => c.nome === name);
+  };
+
+  if (inputTutor) {
+    inputTutor.addEventListener('input', () => {
+      const client = getSelectedClient();
+      
+      // Reset Pet fields
+      inputPet.value = '';
+      listPets.innerHTML = '';
+      
+      if (client && client.pets && client.pets.length > 0) {
+        listPets.innerHTML = client.pets
+          .map(p => `<option value="${p.nome}">${p.especie}</option>`)
+          .join('');
+          
+        // Auto-select if only one pet
+        if (client.pets.length === 1) {
+           inputPet.value = client.pets[0].nome;
+           inputPet.dispatchEvent(new Event('input')); // Trigger species update
+        }
+      }
+    });
+  }
+
+  if (inputPet) {
+    inputPet.addEventListener('input', () => {
+      const client = getSelectedClient();
+      if (!client) return;
+      const petName = inputPet.value;
+      const pet = client.pets.find(p => p.nome === petName);
+      
+      if (pet && inputEspecie) {
+        // Try to match species string to Select options
+        // Simple mapping or just setting value if it matches
+        const options = Array.from(inputEspecie.options).map(o => o.value);
+        // Basic fuzzy match or direct match
+        if (options.includes(pet.especie)) {
+           inputEspecie.value = pet.especie;
+        } else {
+           // Fallback: try to map common variations
+           if (pet.especie.toLowerCase().includes('cao') || pet.especie.toLowerCase().includes('canina')) inputEspecie.value = 'Canina';
+           if (pet.especie.toLowerCase().includes('gato') || pet.especie.toLowerCase().includes('felina')) inputEspecie.value = 'Felina';
+        }
+      }
+    });
+  }
+
+  // ----------------------------------
+
   const limparFormulario = (form) => {
     form.reset();
   };
@@ -119,6 +201,11 @@
     event.preventDefault();
     if (!formAgendamento) return;
     const dados = new FormData(formAgendamento);
+    
+    // Find contact info if available from selected client
+    const client = getSelectedClient();
+    const contato = client ? (client.telefone || client.email) : '';
+
     const payload = {
       tutor_nome: dados.get('tutor') || '',
       pet_nome: dados.get('pet') || '',
@@ -133,8 +220,8 @@
       status: dados.get('status') || 'Programado',
       canal: dados.get('canal') || 'Telefone',
       observacoes: dados.get('obs') || '',
-      contato: '',
-      destaque: true,
+      contato: contato, 
+      destaque: true, // Default logic
     };
 
     if (!payload.pet_nome || !payload.tutor_nome || !payload.data || !payload.hora) {
@@ -168,4 +255,5 @@
   formAgendamento?.addEventListener('submit', onSubmit);
 
   carregarAgendamentos();
+  carregarClientes();
 })();

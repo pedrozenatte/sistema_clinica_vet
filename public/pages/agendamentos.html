@@ -56,12 +56,14 @@
         <div class="grid g-4">
           <label class="field field-2">
             <span>Tutor</span>
-            <input type="text" name="tutor" placeholder="Ex.: João da Silva" />
+            <input type="text" name="tutor" list="listTutores" placeholder="Ex.: João da Silva" autocomplete="off" />
+            <datalist id="listTutores"></datalist>
           </label>
 
           <label class="field">
             <span>Pet</span>
-            <input type="text" name="pet" placeholder="Ex.: Luna" />
+            <input type="text" name="pet" list="listPets" placeholder="Ex.: Luna" autocomplete="off" />
+            <datalist id="listPets"></datalist>
           </label>
 
           <label class="field">
