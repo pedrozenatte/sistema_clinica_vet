@@ -3,16 +3,53 @@ import { randomUUID } from 'node:crypto';
 import { supabase } from '../lib/supabaseClient.js';
 
 const router = Router();
-const baseSelect = 'id,codigo,nome,cpf,email,telefone,situacao,pets ( id,nome,especie )';
+const baseSelect = '*,pets ( * )';
 const generateCodigo = () => `CLI-${randomUUID().split('-')[0].toUpperCase()}`;
 
 const sanitizePattern = (value = '') => `%${value}%`.replace(/,/g, '');
+const pickClienteColumns = (input = {}) => {
+  const allowed = [
+    'codigo',
+    'nome',
+    'cpf',
+    'email',
+    'telefone',
+    'situacao',
+    'rua',
+    'numero',
+    'complemento',
+    'bairro',
+    'cep',
+    'cidade',
+    'estado',
+    'pais',
+  ];
+  return allowed.reduce((acc, key) => {
+    if (input[key] !== undefined && input[key] !== null) {
+      acc[key] = input[key];
+    }
+    return acc;
+  }, {});
+};
+
+const pickPetColumns = (input = {}) => {
+  const allowed = ['nome', 'especie', 'raca'];
+  return allowed.reduce((acc, key) => {
+    const value = input[key];
+    if (value !== undefined && value !== null && value !== '') {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
+};
+
 const normalizePets = (input) => {
   if (!Array.isArray(input)) return [];
   return input
     .map((pet) => ({
       nome: (pet?.nome || '').trim(),
       especie: (pet?.especie || '').trim(),
+      raca: (pet?.raca || '').trim(),
     }))
     .filter((pet) => pet.nome);
 };
@@ -27,9 +64,7 @@ router.get('/', async (req, res) => {
 
   if (q) {
     const pattern = sanitizePattern(q);
-    query = query.or(
-      `nome.ilike.${pattern},cpf.ilike.${pattern},email.ilike.${pattern},cidade.ilike.${pattern},uf.ilike.${pattern}`,
-    );
+    query = query.or(`nome.ilike.${pattern},cpf.ilike.${pattern},email.ilike.${pattern},cidade.ilike.${pattern}`);
   }
 
   const { data, error } = await query;
@@ -57,17 +92,18 @@ router.get('/:codigo', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { pet, pets, ...cliente } = req.body;
+  const { pet, pets, estado, ...cliente } = req.body;
   if (!cliente.nome) {
     return res.status(400).json({ error: 'Campo "nome" é obrigatório.' });
   }
 
   const codigo = (cliente.codigo || '').trim() || generateCodigo();
   const petsPayload = normalizePets(pets || (pet ? [pet] : []));
+  const payload = pickClienteColumns({ ...cliente, codigo });
 
   const { data, error } = await supabase
     .from('clientes')
-    .insert({ ...cliente, codigo })
+    .insert(payload)
     .select()
     .single();
 
@@ -76,9 +112,12 @@ router.post('/', async (req, res) => {
   }
 
   if (petsPayload.length) {
-    await supabase
+    const { error: petsError } = await supabase
       .from('pets')
-      .insert(petsPayload.map((p) => ({ ...p, cliente_id: data.id })));
+      .insert(petsPayload.map((p) => ({ ...pickPetColumns(p), cliente_id: data.id })));
+    if (petsError) {
+      return res.status(400).json({ error: petsError.message });
+    }
   }
 
   const { data: full, error: fetchError } = await supabase
@@ -96,13 +135,14 @@ router.post('/', async (req, res) => {
 
 router.put('/:codigo', async (req, res) => {
   const { codigo } = req.params;
-  const { pet, pets, ...cliente } = req.body;
+  const { pet, pets, estado, ...cliente } = req.body;
 
   if (!cliente.nome) {
     return res.status(400).json({ error: 'Campo "nome" é obrigatório.' });
   }
 
   const petsPayload = normalizePets(pets || (pet ? [pet] : []));
+  const payload = pickClienteColumns(cliente);
 
   const { data: existing, error: findError } = await supabase
     .from('clientes')
@@ -116,7 +156,7 @@ router.put('/:codigo', async (req, res) => {
 
   const { data: updated, error: updateError } = await supabase
     .from('clientes')
-    .update(cliente)
+    .update(payload)
     .eq('codigo', codigo)
     .select()
     .single();
@@ -127,9 +167,12 @@ router.put('/:codigo', async (req, res) => {
 
   if (petsPayload.length) {
     await supabase.from('pets').delete().eq('cliente_id', existing.id);
-    await supabase
+    const { error: petsError } = await supabase
       .from('pets')
-      .insert(petsPayload.map((p) => ({ ...p, cliente_id: existing.id })));
+      .insert(petsPayload.map((p) => ({ ...pickPetColumns(p), cliente_id: existing.id })));
+    if (petsError) {
+      return res.status(400).json({ error: petsError.message });
+    }
   }
 
   const { data: full, error: fetchError } = await supabase

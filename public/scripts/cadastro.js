@@ -42,7 +42,12 @@
     const rows = data.map((cliente) => {
       const contato = Utils.formatPhone(cliente.telefone);
       const petResumo = cliente.pets && cliente.pets.length
-        ? `${cliente.pets[0].nome} (${cliente.pets[0].especie || '—'})`
+        ? cliente.pets
+          .map((pet) => {
+            const detalhes = [pet.especie, pet.raca].filter(Boolean).join(' — ');
+            return `${pet.nome}${detalhes ? ` (${detalhes})` : ''}`;
+          })
+          .join(', ')
         : '—';
       return `
         <tr data-codigo="${cliente.codigo}">
@@ -52,7 +57,7 @@
           <td>${petResumo}</td>
           <td>${contato || '—'}</td>
           <td>${cliente.email || '—'}</td>
-          <td>${cliente.cidade ? `${cliente.cidade}/${cliente.uf || ''}` : '—'}</td>
+          <td>${cliente.cidade || '—'}</td>
           <td>${statusPill(cliente.situacao || 'Ativo')}</td>
           <td>
             <button type="button" class="btn btn-ghost" data-codigo="${cliente.codigo}">Editar</button>
@@ -82,8 +87,7 @@
         cliente.cpf,
         cliente.email,
         cliente.cidade,
-        cliente.uf,
-        cliente?.pets?.[0]?.nome,
+        ...(cliente.pets || []).map((p) => p.nome),
       ]
         .filter(Boolean)
         .map(normalizar)
@@ -116,8 +120,8 @@
           </select>
         </label>
         <label class="field field-2">
-          <span>Observações</span>
-          <input type="text" name="pet_obs" value="${pet.observacoes || ''}" placeholder="Raça, idade, observações..." />
+          <span>Raça</span>
+          <input type="text" name="pet_raca" value="${pet.raca || ''}" placeholder="Ex.: SRD" />
         </label>
         <div class="pet-row__actions">
           <button type="button" class="btn btn-ghost btn-small" data-action="remove-pet">Remover</button>
@@ -139,8 +143,9 @@
       .map((row) => {
         const nome = row.querySelector('input[name="pet_nome"]')?.value.trim() || '';
         const especie = row.querySelector('select[name="pet_especie"]')?.value.trim() || '';
+        const raca = row.querySelector('input[name="pet_raca"]')?.value.trim() || '';
         if (!nome && !especie) return null;
-        return { nome, especie };
+        return { nome, especie, raca };
       })
       .filter(Boolean);
   };
@@ -191,7 +196,7 @@
     if (!form) return null;
     const data = new FormData(form);
     const nome = sanitize(data.get('nome'));
-    const payload = {
+    const valores = {
       nome,
       cpf: sanitize(data.get('cpf')),
       email: sanitize(data.get('email')),
@@ -204,15 +209,32 @@
       bairro: sanitize(data.get('bairro')),
       cep: sanitize(data.get('cep')),
       cidade: sanitize(data.get('cidade')),
-      uf: sanitize(data.get('estado')),
+      estado: sanitize(data.get('estado')),
       pais: sanitize(data.get('pais')),
+    };
+
+    const payload = {
+      nome: valores.nome,
+      cpf: valores.cpf,
+      email: valores.email,
+      telefone: valores.telefone,
+      situacao: valores.situacao,
+      codigo: valores.codigo,
+      rua: valores.rua,
+      numero: valores.numero,
+      complemento: valores.complemento,
+      bairro: valores.bairro,
+      cep: valores.cep,
+      cidade: valores.cidade,
+      estado: valores.estado,
+      pais: valores.pais,
     };
 
     const pets = collectPets();
     const missing = [];
 
     requiredFields.forEach((field) => {
-      if (!payload[field.name]) {
+      if (!valores[field.name]) {
         missing.push(field.label);
       }
     });
@@ -341,6 +363,25 @@
     form.querySelector('input[name="telefone"]').value = cliente.telefone || '';
     form.querySelector('input[name="email"]').value = cliente.email || '';
     form.querySelector('input[name="codigo"]').value = cliente.codigo || '';
+    form.querySelector('input[name="rua"]').value = cliente.rua || '';
+    form.querySelector('input[name="numero"]').value = cliente.numero || '';
+    form.querySelector('input[name="complemento"]').value = cliente.complemento || '';
+    form.querySelector('input[name="bairro"]').value = cliente.bairro || '';
+    form.querySelector('input[name="cep"]').value = cliente.cep || '';
+    form.querySelector('input[name="cidade"]').value = cliente.cidade || '';
+    const selectEstado = form.querySelector('select[name="estado"]');
+    if (selectEstado) {
+      const valorEstado = (cliente.estado || '').trim().toUpperCase();
+      const existe = Array.from(selectEstado.options).some((opt) => opt.value === valorEstado);
+      if (!existe && valorEstado) {
+        const opt = document.createElement('option');
+        opt.value = valorEstado;
+        opt.textContent = valorEstado;
+        selectEstado.appendChild(opt);
+      }
+      selectEstado.value = valorEstado;
+    }
+    form.querySelector('input[name="pais"]').value = cliente.pais || '';
     const situacao = form.querySelector('select[name="situacao"]');
     if (situacao) situacao.value = cliente.situacao || 'Ativo';
 
@@ -355,6 +396,7 @@
       if (!resp.ok) throw new Error('Cliente não encontrado.');
       const cliente = await resp.json();
       preencherFormulario(cliente);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error(error);
       alert(error.message);
@@ -378,6 +420,7 @@
   const abrirFormulario = () => {
     if (!formWrapper) return;
     formWrapper.removeAttribute('hidden');
+    formWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const fecharFormulario = () => {
@@ -393,6 +436,7 @@
     setEditingState(null);
     form?.reset();
     renderPets([{}]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   btnCancelarForm?.addEventListener('click', () => {
