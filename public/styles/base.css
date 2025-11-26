@@ -537,3 +537,16 @@ tbody tr:hover {
     padding: 24px 18px 32px;
   }
 }
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pagination-controls span {
+  color: var(--muted);
+  font-size: 13px;
+}

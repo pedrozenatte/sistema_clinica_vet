@@ -26,9 +26,14 @@
   
   let agendamentos = [];
   let clientesData = [];
+  let filteredItems = [];
+  let currentPage = 1;
+  const itemsPerPage = 10;
   let editingId = null;
   let selectedClienteId = null;
   let selectedPetId = null;
+
+  const paginationControls = document.getElementById('paginationControls');
 
   const badgeClass = (status) => {
     const map = {
@@ -154,7 +159,6 @@
   const renderAgenda = (data) => {
     if (!tableAgenda) return;
     const rows = data
-      .sort((a, b) => `${a.data} ${a.hora}`.localeCompare(`${b.data} ${b.hora}`))
       .map((item) => {
         const podeAtender = canAttend(item.status);
         return `
@@ -183,6 +187,40 @@
     Utils.renderRows(tableAgenda, rows, 9, 'Nenhum agendamento encontrado.');
   };
 
+  const renderPaginationControls = () => {
+    if (!paginationControls) return;
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+    
+    paginationControls.innerHTML = `
+      <button class="btn btn-ghost btn-small" id="btnPrevPage" ${currentPage === 1 ? 'disabled' : ''}>Anterior</button>
+      <span>Página ${currentPage} de ${totalPages}</span>
+      <button class="btn btn-ghost btn-small" id="btnNextPage" ${currentPage >= totalPages ? 'disabled' : ''}>Próxima página</button>
+    `;
+
+    document.getElementById('btnPrevPage')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderPagination();
+      }
+    });
+
+    document.getElementById('btnNextPage')?.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderPagination();
+      }
+    });
+  };
+
+  const renderPagination = () => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageItems = filteredItems.slice(start, end);
+    
+    renderAgenda(pageItems);
+    renderPaginationControls();
+  };
+
   const aplicarFiltros = () => {
     const especieFiltro = (filtroEspecie?.value || '').toLowerCase();
     const periodoDias = parseInt(filtroPeriodo?.value || '', 10);
@@ -192,7 +230,7 @@
         ? new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - periodoDias)
         : null;
 
-    const filtrados = agendamentos.filter((item) => {
+    filteredItems = agendamentos.filter((item) => {
       const dataAtual = getDateTime(item);
       if (Number.isNaN(dataAtual)) return false;
       if (inicio && dataAtual < inicio) return false;
@@ -200,10 +238,15 @@
       return true;
     });
 
-    renderAgenda(filtrados);
+    // Sort filtered items
+    filteredItems.sort((a, b) => `${a.data} ${a.hora}`.localeCompare(`${b.data} ${b.hora}`));
+
+    currentPage = 1;
+    renderPagination();
+
     if (agendaCountLabel) {
       agendaCountLabel.textContent =
-        filtrados.length === 1 ? '1 registro' : `${filtrados.length} registros`;
+        filteredItems.length === 1 ? '1 registro' : `${filteredItems.length} registros`;
     }
   };
 

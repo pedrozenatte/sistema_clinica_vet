@@ -7,12 +7,17 @@
   const listaTutores = document.getElementById('listaAtdTutores');
   const listaPets = document.getElementById('listaAtdPets');
 
-  let atendimentos = [];
+  let atendamentos = [];
   let clientes = [];
+  let filteredItems = [];
+  let currentPage = 1;
+  const itemsPerPage = 10;
   let editingId = null;
   let selectedClienteId = null;
   let selectedPetId = null;
   let selectedAgendamentoId = null;
+
+  const paginationControls = document.getElementById('paginationControls');
 
   const badgeClass = (status = '') => {
     const map = {
@@ -109,7 +114,6 @@
   const renderTabela = (data) => {
     if (!tableBody) return;
     const rows = data
-      .sort((a, b) => `${a.data} ${a.hora}`.localeCompare(`${b.data} ${b.hora}`))
       .map(
         (item) => `
         <tr data-id="${item.id}">
@@ -132,11 +136,45 @@
     Utils.renderRows(tableBody, rows, 7, 'Nenhum atendimento registrado.');
   };
 
+  const renderPaginationControls = () => {
+    if (!paginationControls) return;
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+    
+    paginationControls.innerHTML = `
+      <button class="btn btn-ghost btn-small" id="btnPrevPage" ${currentPage === 1 ? 'disabled' : ''}>Anterior</button>
+      <span>Página ${currentPage} de ${totalPages}</span>
+      <button class="btn btn-ghost btn-small" id="btnNextPage" ${currentPage >= totalPages ? 'disabled' : ''}>Próxima página</button>
+    `;
+
+    document.getElementById('btnPrevPage')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderPagination();
+      }
+    });
+
+    document.getElementById('btnNextPage')?.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderPagination();
+      }
+    });
+  };
+
+  const renderPagination = () => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageItems = filteredItems.slice(start, end);
+    
+    renderTabela(pageItems);
+    renderPaginationControls();
+  };
+
   const aplicarFiltros = () => {
     const statusFiltro = filtroStatus?.value || '';
     const busca = normalize(filtroBusca?.value || '');
 
-    const filtrados = atendimentos.filter((item) => {
+    filteredItems = atendimentos.filter((item) => {
       if (statusFiltro && item.status !== statusFiltro) return false;
       if (!busca) return true;
       const alvo = [item.pet_nome, item.tutor_nome, item.veterinario]
@@ -145,8 +183,12 @@
         .join(' ');
       return alvo.includes(busca);
     });
+    
+    // Sort filtered items
+    filteredItems.sort((a, b) => `${a.data} ${a.hora}`.localeCompare(`${b.data} ${b.hora}`));
 
-    renderTabela(filtrados);
+    currentPage = 1;
+    renderPagination();
   };
 
   const carregarAtendimentos = async () => {
