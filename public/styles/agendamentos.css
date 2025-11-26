@@ -117,8 +117,9 @@ legend::before {
 
 .table-actions {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .detail-grid {
@@ -264,7 +265,7 @@ legend::before {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-right: 8px;
+  margin-right: 0;
   transition: transform 0.2s ease;
 }
 

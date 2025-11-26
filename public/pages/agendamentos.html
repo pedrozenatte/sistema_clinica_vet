@@ -159,7 +159,8 @@
           <div class="form-actions">
             <button type="reset" class="btn btn-ghost">Limpar</button>
             <div class="spacer"></div>
-            <button type="button" class="btn btn-danger">Cancelar</button>
+            <button type="button" class="btn btn-ghost btn-danger" id="btnExcluirAgendamento" hidden>Excluir</button>
+            <button type="button" class="btn btn-danger" id="btnCancelarAgendamento">Cancelar</button>
             <button type="submit" class="btn btn-primary">Agendar</button>
           </div>
         </div>
@@ -191,7 +192,7 @@
               <option value="7">Últimos 7 dias</option>
               <option value="15">Últimos 15 dias</option>
               <option value="30">Últimos 30 dias</option>
-              <option value="">Todos</option>
+              <option value="" selected>Todos</option>
             </select>
           </label>
         </div>
