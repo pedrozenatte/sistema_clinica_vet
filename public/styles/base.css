@@ -158,6 +158,15 @@ img {
   transform: translateX(2px);
 }
 
+.sidenav-footer {
+  margin-top: 18px;
+}
+
+.sidenav-footer .btn {
+  width: 100%;
+  justify-content: center;
+}
+
 .sidenav-nav a:hover::before {
   opacity: 1;
 }

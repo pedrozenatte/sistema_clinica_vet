@@ -4,10 +4,12 @@ import cors from 'cors';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import authRouter from './routes/auth.js';
 import clientesRouter from './routes/clientes.js';
 import agendamentosRouter from './routes/agendamentos.js';
 import atendimentosRouter from './routes/atendimentos.js';
 import dashboardRouter from './routes/dashboard.js';
+import { attachUserIfPresent, requireAuth, requirePageAuth } from './middlewares/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +21,12 @@ app.use(express.urlencoded({ extended: false }));
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+app.use('/api/auth', authRouter);
+
+app.use(attachUserIfPresent);
+app.use(requirePageAuth);
+app.use('/api', requireAuth);
 
 app.use('/api/clientes', clientesRouter);
 app.use('/api/agendamentos', agendamentosRouter);

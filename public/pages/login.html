@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clínica Vet — Acesso</title>
+    <link rel="stylesheet" href="../styles/base.css" />
+    <style>
+      body {
+        grid-template-columns: 1fr;
+        place-items: center;
+        padding: 32px 16px;
+      }
+      .auth-card {
+        width: min(480px, 100%);
+        background: rgba(12, 19, 43, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 32px;
+      }
+      .auth-card h1 {
+        margin: 0 0 8px;
+      }
+      .auth-card p {
+        margin: 0 0 20px;
+      }
+      .auth-card form {
+        display: grid;
+        gap: 14px;
+      }
+      .auth-card label {
+        display: grid;
+        gap: 6px;
+      }
+      .auth-card input {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+      }
+      .auth-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 6px;
+      }
+      .auth-footer {
+        margin-top: 18px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .auth-footer button {
+        border: none;
+        background: none;
+        color: var(--primary);
+        cursor: pointer;
+        padding: 0;
+        font-weight: 600;
+      }
+      .error {
+        color: var(--danger);
+        font-size: 14px;
+        margin: 4px 0 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="auth-card">
+      <header>
+        <div class="brand" style="margin-bottom: 12px;">
+          <div class="brand-logo">🐾</div>
+          <div class="brand-name"><strong>CLÍNICA</strong><span>VET</span></div>
+        </div>
+        <h1 id="authTitle">Acessar</h1>
+        <p class="muted">Faça login ou crie sua conta para acessar o painel.</p>
+      </header>
+
+      <form id="authForm">
+        <label>
+          <span>E-mail</span>
+          <input type="email" name="email" autocomplete="email" required />
+        </label>
+        <label>
+          <span>Senha</span>
+          <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+        <div class="auth-actions">
+          <button type="submit" class="btn btn-primary" id="btnSubmit">Entrar</button>
+          <button type="button" class="btn btn-ghost" id="btnToggleMode">Criar conta</button>
+        </div>
+        <div id="errorBox" class="error" hidden></div>
+      </form>
+
+      <div class="auth-footer">
+        Dica: use um e-mail válido; o cadastro é imediato nesta versão.
+      </div>
+    </main>
+
+    <script src="../scripts/login.js"></script>
+  </body>
+</html>
