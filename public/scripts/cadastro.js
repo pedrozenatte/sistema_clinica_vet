@@ -25,9 +25,14 @@
   const clientesWrapper = document.getElementById('clientesWrapper');
   const petsWrapper = document.getElementById('petsWrapper');
   const listaViewLabel = document.getElementById('listaViewLabel');
+  const paginationControls = document.getElementById('paginationControls');
 
   const clientes = [];
   let petsCache = [];
+  let filteredItems = [];
+  let currentPage = 1;
+  const itemsPerPage = 10;
+  
   let editingCodigo = null;
   let currentView = 'clientes';
 
@@ -100,6 +105,45 @@
     Utils.renderRows(petsTableBody, rows, 9, 'Nenhum pet encontrado.');
   };
 
+  const renderPaginationControls = () => {
+    if (!paginationControls) return;
+    
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+    
+    paginationControls.innerHTML = `
+      <button class="btn btn-ghost btn-small" id="btnPrevPage" ${currentPage === 1 ? 'disabled' : ''}>Anterior</button>
+      <span>Página ${currentPage} de ${totalPages}</span>
+      <button class="btn btn-ghost btn-small" id="btnNextPage" ${currentPage >= totalPages ? 'disabled' : ''}>Próxima página</button>
+    `;
+
+    document.getElementById('btnPrevPage')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderPagination();
+      }
+    });
+
+    document.getElementById('btnNextPage')?.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderPagination();
+      }
+    });
+  };
+
+  const renderPagination = () => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageItems = filteredItems.slice(start, end);
+
+    if (currentView === 'clientes') {
+      renderClientes(pageItems);
+    } else {
+      renderPetsTable(pageItems);
+    }
+    renderPaginationControls();
+  };
+
   const normalizar = (texto = '') =>
     texto
       .normalize('NFD')
@@ -122,37 +166,36 @@
     const situacao = situacaoFiltro?.value || '';
     const termo = normalizar(buscaInput?.value || '');
 
-    const resultadoClientes = clientes.filter((cliente) => {
-      if (situacao && cliente.situacao !== situacao) return false;
-      if (!termo) return true;
-      const alvo = [
-        cliente.nome,
-        cliente.cpf,
-        cliente.email,
-        cliente.cidade,
-        ...(cliente.pets || []).map((p) => p.nome),
-      ]
-        .filter(Boolean)
-        .map(normalizar)
-        .join(' ');
-      return alvo.includes(termo);
-    });
-
-    const resultadoPets = petsCache.filter((pet) => {
-      if (situacao && pet.situacao !== situacao) return false;
-      if (!termo) return true;
-      const alvo = [pet.nome, pet.especie, pet.raca, pet.sexo, pet.tutor, pet.tutorCodigo]
-        .filter(Boolean)
-        .map(normalizar)
-        .join(' ');
-      return alvo.includes(termo);
-    });
-
     if (currentView === 'clientes') {
-      renderClientes(resultadoClientes);
+      filteredItems = clientes.filter((cliente) => {
+        if (situacao && cliente.situacao !== situacao) return false;
+        if (!termo) return true;
+        const alvo = [
+          cliente.nome,
+          cliente.cpf,
+          cliente.email,
+          cliente.cidade,
+          ...(cliente.pets || []).map((p) => p.nome),
+        ]
+          .filter(Boolean)
+          .map(normalizar)
+          .join(' ');
+        return alvo.includes(termo);
+      });
     } else {
-      renderPetsTable(resultadoPets);
+      filteredItems = petsCache.filter((pet) => {
+        if (situacao && pet.situacao !== situacao) return false;
+        if (!termo) return true;
+        const alvo = [pet.nome, pet.especie, pet.raca, pet.sexo, pet.tutor, pet.tutorCodigo]
+          .filter(Boolean)
+          .map(normalizar)
+          .join(' ');
+        return alvo.includes(termo);
+      });
     }
+    
+    currentPage = 1;
+    renderPagination();
   };
 
   const filtrarDebounced = Utils.debounce(filtrar, 200);

@@ -511,3 +511,14 @@ legend::before {
     flex-direction: column;
   }
 }
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-controls span {
+  color: var(--muted);
+  font-size: 13px;
+}
