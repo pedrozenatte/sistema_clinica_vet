@@ -2,11 +2,16 @@
   const locale = "pt-BR";
 
   const toDate = (value) => {
-    if (value instanceof Date) return value;
-    if (typeof value === "number") return new Date(value);
-    if (typeof value === "string") {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+    if (typeof value === "number") {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+    if (typeof value === "string" && value.trim() !== "") {
       const parsed = new Date(value);
-      if (!Number.isNaN(parsed)) return parsed;
+      if (!Number.isNaN(parsed.getTime())) return parsed;
     }
     return null;
   };
@@ -22,7 +27,7 @@
   };
 
   const formatTime = (value, opts = {}) => {
-    if (typeof value === "string" && /^\\d{2}:\\d{2}(:\\d{2})?$/.test(value)) {
+    if (typeof value === "string" && /^\d{2}:\d{2}(:\d{2})?$/.test(value)) {
       return value.substring(0, 5);
     }
     const date = toDate(value);

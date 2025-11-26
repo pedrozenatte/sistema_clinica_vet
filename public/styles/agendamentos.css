@@ -223,23 +223,32 @@ legend::before {
   }
 }
 
-.cadastro-table {
-  min-width: 980px;
+.agenda-table {
+  min-width: 1180px;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.cadastro-table th {
+.agenda-table thead th {
   background: rgba(13, 20, 50, 0.85);
   position: sticky;
   top: 0;
   z-index: 2;
   backdrop-filter: blur(8px);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.08em;
 }
 
-.cadastro-table tbody tr:hover {
+.agenda-table tbody td {
+  white-space: nowrap;
+}
+
+.agenda-table tbody tr:hover {
   background: rgba(130, 66, 255, 0.08);
 }
 
-.cadastro-table tr.row-highlight {
+.agenda-table tr.row-highlight {
   outline: 2px solid rgba(129, 140, 248, 0.9);
   box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
 }

@@ -20,6 +20,22 @@
   margin: 0;
 }
 
+.field-lock-value {
+  display: none;
+  font-weight: 600;
+  color: var(--text);
+  padding: 6px 0;
+}
+
+.field[data-locked="true"] .field-lock-value {
+  display: block;
+}
+
+.field[data-locked="true"] input,
+.field[data-locked="true"] select {
+  display: none;
+}
+
 .card-sub .field + .field {
   margin-top: 8px;
 }

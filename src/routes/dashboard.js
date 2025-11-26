@@ -35,13 +35,47 @@ const parseDurationToMinutes = (value) => {
   return null;
 };
 
-const handleMissing = (result) => {
-  if (!result || !result.error) return result;
-  const message = result.error.message || '';
-  if (/does not exist|relation|undefined_table|column/.test(message)) {
-    return { data: [], count: 0 };
+const safeQuery = async (promise, fallback = []) => {
+  try {
+    const { data, error, count } = await promise;
+    if (error) {
+      console.error('[dashboard] query failed:', error.message);
+      return { data: Array.isArray(fallback) ? fallback : [], count: count ?? 0, error };
+    }
+    return { data: data ?? fallback, count: count ?? 0 };
+  } catch (error) {
+    console.error('[dashboard] query crashed:', error.message);
+    return { data: Array.isArray(fallback) ? fallback : [], count: 0, error };
   }
-  throw result.error;
+};
+
+const normalizeDate = (value) => {
+  if (!value) return null;
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value.toISOString().slice(0, 10);
+  }
+  if (typeof value === 'string') {
+    if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+      return value.slice(0, 10);
+    }
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed.toISOString().slice(0, 10);
+    }
+  }
+  return null;
+};
+
+const normalizeTime = (value) => {
+  if (!value) return null;
+  if (typeof value === 'string') {
+    const match = value.match(/(\d{2}):(\d{2})/);
+    if (match) return `${match[1]}:${match[2]}`;
+  }
+  if (value instanceof Date) {
+    return value.toISOString().slice(11, 16);
+  }
+  return null;
 };
 
 router.get('/', async (req, res) => {
@@ -53,43 +87,54 @@ router.get('/', async (req, res) => {
   const endDateISO = now.toISOString().slice(0, 10);
 
   try {
-    const [agendamentosRes, atendimentosCountRes, ultimosAtendimentosRes, ultimosClientesRes] = await Promise.all([
+    const agendamentosPromise = safeQuery(
       supabase
         .from('agendamentos')
         .select('id,data,hora,pet_nome,especie,tutor_nome,servico,veterinario,status,contato,duracao')
         .gte('data', startDateISO)
         .lte('data', endDateISO),
+    );
+    const atendimentosPromise = safeQuery(
       supabase
         .from('atendimentos')
-        .select('id', { count: 'exact', head: true })
+        .select('id,tipo,status')
         .gte('data', startDateISO)
         .lte('data', endDateISO),
+    );
+    const ultimosAtendimentosPromise = safeQuery(
       supabase
         .from('atendimentos')
-        .select('data,hora,pet_nome,especie,tutor_nome,servico,status')
+        .select('data,hora,pet_nome,especie,tutor_nome,veterinario,tipo,status')
         .order('data', { ascending: false })
         .order('hora', { ascending: false })
         .limit(4),
+    );
+    const ultimosClientesPromise = safeQuery(
       supabase
         .from('clientes')
         .select('codigo,nome,telefone,created_at,pets ( nome, especie )')
         .order('created_at', { ascending: false, nullsFirst: false })
         .limit(4),
-    ]);
+    );
 
-    const agendamentosData = handleMissing(agendamentosRes).data || [];
-    const atendimentosCountData = handleMissing(atendimentosCountRes);
-    const ultimosAtendimentosData = handleMissing(ultimosAtendimentosRes).data || [];
+    const [agendamentosRes, atendimentosRes, ultimosAtendimentosRes, ultimosClientesRes] =
+      await Promise.all([agendamentosPromise, atendimentosPromise, ultimosAtendimentosPromise, ultimosClientesPromise]);
+
+    const agendamentosData = agendamentosRes.data || [];
+    const atendimentosData = atendimentosRes.data || [];
+    const ultimosAtendimentosData = ultimosAtendimentosRes.data || [];
 
     // Fallback para clientes caso created_at não exista
-    let ultimosClientesData = handleMissing(ultimosClientesRes).data || [];
+    let ultimosClientesData = ultimosClientesRes.data || [];
     if ((ultimosClientesRes.error && /created_at/.test(ultimosClientesRes.error.message)) || !ultimosClientesData.length) {
-      const fallback = await supabase
-        .from('clientes')
-        .select('codigo,nome,telefone,pets ( nome, especie )')
-        .order('codigo', { ascending: false })
-        .limit(4);
-      const fallbackData = handleMissing(fallback).data || [];
+      const fallback = await safeQuery(
+        supabase
+          .from('clientes')
+          .select('codigo,nome,telefone,pets ( nome, especie )')
+          .order('codigo', { ascending: false })
+          .limit(4),
+      );
+      const fallbackData = fallback.data || [];
       if (fallbackData.length) {
         ultimosClientesData = fallbackData;
       }
@@ -103,21 +148,14 @@ router.get('/', async (req, res) => {
       ? Math.round(durations.reduce((acc, curr) => acc + curr, 0) / durations.length)
       : 0;
 
-    const statusBuckets = {
-      resolved: 0,
-      in_progress: 0,
-      pending: 0,
-      cancelled: 0,
-    };
-
-    agendamentos.forEach((item) => {
+    const statusBuckets = { resolved: 0, in_progress: 0, pending: 0, cancelled: 0 };
+    atendimentosData.forEach((item) => {
       const bucket = mapStatusBucket(item.status);
       statusBuckets[bucket] += 1;
     });
-
-    const totalAgendamentos = agendamentos.length || 1; // evita divisão por zero
-    const resolucaoPerc = Math.round((statusBuckets.resolved / totalAgendamentos) * 1000) / 10;
-    const abandonoPerc = Math.round((statusBuckets.cancelled / totalAgendamentos) * 1000) / 10;
+    const totalAtendimentos = atendimentosData.length || 1;
+    const resolucaoPerc = Math.round((statusBuckets.resolved / totalAtendimentos) * 1000) / 10;
+    const abandonoPerc = Math.round((statusBuckets.cancelled / totalAtendimentos) * 1000) / 10;
 
     const response = {
       period: {
@@ -126,19 +164,19 @@ router.get('/', async (req, res) => {
         days,
       },
       kpis: {
-        atendimentos: atendimentosCountData.count || 0,
+        atendimentos: atendimentosData.length,
         mediaDuracaoMin: avgDuration,
         resolucaoPerc: Number.isFinite(resolucaoPerc) ? resolucaoPerc : 0,
         abandonoPerc: Number.isFinite(abandonoPerc) ? abandonoPerc : 0,
       },
       statusBuckets,
       ultimosAtendimentos: (ultimosAtendimentosData || []).map((item) => ({
-        data: item.data,
-        hora: item.hora,
+        data: normalizeDate(item.data),
+        hora: normalizeTime(item.hora),
         pet: item.pet_nome,
         especie: item.especie,
         tutor: item.tutor_nome,
-        servico: item.servico,
+        servico: item.tipo || item.veterinario || 'Atendimento',
         status: item.status,
       })),
       ultimosCadastros: (ultimosClientesData || []).map((item) => ({

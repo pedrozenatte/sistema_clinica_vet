@@ -4,7 +4,6 @@
   const btnNovo = document.getElementById('btnNovoAtendimento');
   const filtroStatus = document.getElementById('atdFiltroStatus');
   const filtroBusca = document.getElementById('atdBusca');
-  const countLabel = document.getElementById('atdCount');
   const listaTutores = document.getElementById('listaAtdTutores');
   const listaPets = document.getElementById('listaAtdPets');
 
@@ -86,6 +85,27 @@
     return cliente.pets.find((pet) => (pet.nome || '').toLowerCase() === petNome.toLowerCase());
   };
 
+  const lockableFields = ['tutor', 'pet', 'especie', 'data', 'hora', 'tipo'];
+
+  const setFieldLock = (name, value, locked) => {
+    if (!form) return;
+    const field = form.querySelector(`[data-field="${name}"]`);
+    if (!field) return;
+    if (locked) {
+      field.dataset.locked = 'true';
+      const display = field.querySelector('.field-lock-value');
+      if (display) display.textContent = value || '—';
+    } else {
+      delete field.dataset.locked;
+      const display = field.querySelector('.field-lock-value');
+      if (display) display.textContent = '';
+    }
+  };
+
+  const clearFieldLocks = () => {
+    lockableFields.forEach((name) => setFieldLock(name, '', false));
+  };
+
   const renderTabela = (data) => {
     if (!tableBody) return;
     const rows = data
@@ -127,9 +147,6 @@
     });
 
     renderTabela(filtrados);
-    if (countLabel) {
-      countLabel.textContent = filtrados.length === 1 ? '1 registro' : `${filtrados.length} registros`;
-    }
   };
 
   const carregarAtendimentos = async () => {
@@ -199,8 +216,11 @@
     if (petInput) petInput.value = item.pet_nome || '';
     if (especieSelect) especieSelect.value = item.especie || 'Canina';
     form.querySelector('[name="veterinario"]').value = item.veterinario || '';
-    form.querySelector('[name="data"]').value = normalizeDateValue(item.data) || '';
-    form.querySelector('[name="hora"]').value = normalizeTimeValue(item.hora) || '';
+    const dataNormalizada = normalizeDateValue(item.data) || normalizeDateValue(new Date());
+    const horaNormalizada = normalizeTimeValue(item.hora) || normalizeTimeValue(new Date());
+
+    form.querySelector('[name="data"]').value = dataNormalizada;
+    form.querySelector('[name="hora"]').value = horaNormalizada;
     form.querySelector('[name="tipo"]').value = item.tipo || 'Consulta';
     form.querySelector('[name="status"]').value = item.status || 'Em atendimento';
     form.querySelector('[name="anamnese"]').value = item.anamnese || '';
@@ -208,6 +228,17 @@
     form.querySelector('[name="hipoteses"]').value = item.hipoteses || '';
     form.querySelector('[name="exames"]').value = item.exames || '';
     form.querySelector('[name="prescricao"]').value = stringifyPrescricao(item.prescricao);
+
+    const lockValues = {
+      tutor: item.tutor_nome || '',
+      pet: item.pet_nome || '',
+      especie: item.especie || '',
+      data: displayDate(item.data),
+      hora: displayTime(item.hora),
+      tipo: item.tipo || 'Consulta',
+    };
+    const shouldLock = Boolean(item.agendamento_id);
+    lockableFields.forEach((name) => setFieldLock(name, lockValues[name], shouldLock));
   };
 
   const startEditing = (id) => {
@@ -228,6 +259,7 @@
     if (!form) return;
     form.reset();
     resetSelections();
+    clearFieldLocks();
     editingId = null;
     if (btnNovo) {
       const hidden = form.classList.contains('form-hidden');
@@ -355,6 +387,8 @@
     const cliente = getClienteByNome(tutorInput.value);
     selectedClienteId = cliente?.id || null;
     selectedPetId = null;
+    selectedAgendamentoId = null;
+    clearFieldLocks();
     if (listaPets) {
       if (cliente && Array.isArray(cliente.pets)) {
         listaPets.innerHTML = cliente.pets

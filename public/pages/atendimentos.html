@@ -52,15 +52,17 @@
         <h2 class="card-title">Registro clínico</h2>
         <input type="hidden" name="agendamento_id" />
         <div class="grid g-4">
-          <label class="field field-2">
+          <label class="field field-2" data-field="tutor">
             <span>Tutor</span>
             <input type="text" name="tutor" list="listaAtdTutores" placeholder="Ex.: João da Silva" autocomplete="off" />
+            <div class="field-lock-value"></div>
           </label>
-          <label class="field">
+          <label class="field" data-field="pet">
             <span>Pet</span>
             <input type="text" name="pet" list="listaAtdPets" placeholder="Ex.: Luna" autocomplete="off" />
+            <div class="field-lock-value"></div>
           </label>
-          <label class="field">
+          <label class="field" data-field="especie">
             <span>Espécie</span>
             <select name="especie">
               <option>Canina</option>
@@ -68,20 +70,23 @@
               <option>Aves</option>
               <option>Outros</option>
             </select>
+            <div class="field-lock-value"></div>
           </label>
           <label class="field">
             <span>Veterinário</span>
             <input type="text" name="veterinario" placeholder="Responsável pelo atendimento" />
           </label>
-          <label class="field">
+          <label class="field" data-field="data">
             <span>Data</span>
             <input type="date" name="data" />
+            <div class="field-lock-value"></div>
           </label>
-          <label class="field">
+          <label class="field" data-field="hora">
             <span>Hora</span>
             <input type="time" name="hora" />
+            <div class="field-lock-value"></div>
           </label>
-          <label class="field">
+          <label class="field" data-field="tipo">
             <span>Tipo</span>
             <select name="tipo">
               <option>Consulta</option>
@@ -89,6 +94,7 @@
               <option>Emergência</option>
               <option>Check-up</option>
             </select>
+            <div class="field-lock-value"></div>
           </label>
           <label class="field">
             <span>Status</span>
@@ -143,7 +149,6 @@
             <h2 class="card-title">Histórico de atendimentos</h2>
             <p class="muted small">Últimos registros e status</p>
           </div>
-          <span class="agenda-pill" id="atdCount">0 registros</span>
           <div class="agenda-filters">
             <label class="field">
               <span>Status</span>
