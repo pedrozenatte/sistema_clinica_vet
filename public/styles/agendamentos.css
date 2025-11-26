@@ -176,6 +176,30 @@ legend::before {
   position: relative;
 }
 
+.agenda-header {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.agenda-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.agenda-pill {
+  justify-self: flex-start;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .list-header::after {
   content: "";
   position: absolute;
@@ -200,6 +224,10 @@ legend::before {
 
 @media (max-width: 520px) {
   .list-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .agenda-header {
     grid-template-columns: 1fr;
   }
 }

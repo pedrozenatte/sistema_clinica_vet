@@ -5,6 +5,7 @@
   const filtroDataAte = document.getElementById('agendaDataAte');
   const filtroStatus = document.getElementById('agendaStatus');
   const filtroBusca = document.getElementById('agendaBusca');
+  const agendaCountLabel = document.getElementById('agendaCount');
   
   const formAgendamento = document.querySelector('#formAgendamentoWrapper'); 
   const formTitle = formAgendamento?.querySelector('.card-title'); // To change title during edit
@@ -37,10 +38,44 @@
     return map[status] || 'badge-neutral';
   };
 
-  // --- Date/Time Fix ---
-  // Ensure data/hora are displayed correctly even if Supabase sends full strings
-  const displayDate = (val) => Utils.formatDate(val);
-  const displayTime = (val) => Utils.formatTime(val);
+  const normalizeDateValue = (value = '') => {
+    if (!value) return '';
+    if (typeof value === 'string') {
+      const match = value.match(/^\d{4}-\d{2}-\d{2}/);
+      if (match) return match[0];
+    }
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed)) return parsed.toISOString().slice(0, 10);
+    return '';
+  };
+
+  const normalizeTimeValue = (value = '') => {
+    if (!value) return '';
+    if (typeof value === 'string') {
+      const match = value.match(/(\d{2}):(\d{2})/);
+      if (match) return `${match[1]}:${match[2]}`;
+    }
+    if (value instanceof Date) {
+      return value.toISOString().slice(11, 16);
+    }
+    return '';
+  };
+
+  const getDateTime = (item) => {
+    const data = normalizeDateValue(item.data);
+    const hora = normalizeTimeValue(item.hora) || '00:00';
+    return data ? new Date(`${data}T${hora}`) : new Date(NaN);
+  };
+
+  const displayDate = (val) => {
+    const normalized = normalizeDateValue(val);
+    return normalized ? Utils.formatDate(normalized) : '--';
+  };
+
+  const displayTime = (val) => {
+    const normalized = normalizeTimeValue(val);
+    return normalized || '--';
+  };
 
   const renderProximos = () => {
     if (!tableProximos) return;
@@ -48,8 +83,9 @@
     const proximos = agendamentos
       .filter((item) => {
         if (item.destaque) return true;
-        const dataHora = new Date(`${item.data}T${item.hora}`);
-        return dataHora >= agora && item.status !== 'Cancelado' && item.status !== 'Faltou'; 
+        const dataHora = getDateTime(item);
+        if (Number.isNaN(dataHora)) return false;
+        return dataHora >= agora && item.status !== 'Cancelado' && item.status !== 'Faltou';
       })
       .sort((a, b) => `${a.data} ${a.hora}`.localeCompare(`${b.data} ${b.hora}`))
       .slice(0, 3);
@@ -80,7 +116,7 @@
           <td>${item.pet_nome} (${item.especie || '—'})</td>
           <td>${item.tutor_nome}</td>
           <td>${item.servico}</td>
-          <td>${item.veterinario}</td>
+          <td>${item.veterinario || '—'}</td>
           <td><span class="badge ${badgeClass(item.status)}">${item.status}</span></td>
           <td>${Utils.formatPhone(item.contato || '')}</td>
           <td>
@@ -108,7 +144,8 @@
     const busca = normalizar(filtroBusca?.value || '');
 
     const filtrados = agendamentos.filter((item) => {
-      const dataAtual = new Date(`${item.data}T${item.hora}`);
+      const dataAtual = getDateTime(item);
+      if (Number.isNaN(dataAtual)) return false;
       if (inicio && dataAtual < inicio) return false;
       if (fim && dataAtual > fim) return false;
       if (status && item.status !== status) return false;
@@ -120,6 +157,10 @@
     });
 
     renderAgenda(filtrados);
+    if (agendaCountLabel) {
+      agendaCountLabel.textContent =
+        filtrados.length === 1 ? '1 registro' : `${filtrados.length} registros`;
+    }
   };
 
   const carregarAgendamentos = async () => {
@@ -209,8 +250,8 @@
     f.querySelector('[name="especie"]').value = item.especie || 'Canina';
     f.querySelector('[name="servico"]').value = item.servico || 'Consulta';
     f.querySelector('[name="veterinario"]').value = item.veterinario || '';
-    f.querySelector('[name="data"]').value = item.data || '';
-    f.querySelector('[name="hora"]').value = item.hora || '';
+    f.querySelector('[name="data"]').value = normalizeDateValue(item.data) || '';
+    f.querySelector('[name="hora"]').value = normalizeTimeValue(item.hora) || '';
     f.querySelector('[name="duracao"]').value = item.duracao || '30 min';
     f.querySelector('[name="tipo"]').value = item.tipo || 'Presencial';
     f.querySelector('[name="prioridade"]').value = item.prioridade || 'Normal';
@@ -247,14 +288,17 @@
         return client ? (client.telefone || client.email) : '';
     };
 
+    const dataValor = normalizeDateValue(dados.get('data'));
+    const horaValor = normalizeTimeValue(dados.get('hora'));
+
     const payload = {
       tutor_nome: dados.get('tutor') || '',
       pet_nome: dados.get('pet') || '',
       especie: dados.get('especie') || '',
       servico: dados.get('servico') || '',
       veterinario: dados.get('veterinario') || '',
-      data: dados.get('data'),
-      hora: dados.get('hora'),
+      data: dataValor,
+      hora: horaValor,
       duracao: dados.get('duracao') || '',
       tipo: dados.get('tipo') || '',
       prioridade: dados.get('prioridade') || '',

@@ -71,27 +71,22 @@ legend::before {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  position: relative;
+  padding-top: 52px;
 }
 
 .pet-row__grid {
   width: 100%;
 }
 
-.pet-row__footer {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  flex-wrap: wrap;
+.pet-row__remove {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
-.pet-row__footer .field {
-  flex: 1;
-}
-
-.pet-row__actions {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
+.pet-row__notes {
+  margin: 0;
 }
 
 .modal-backdrop {

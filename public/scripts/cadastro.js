@@ -227,6 +227,9 @@
     const peso = formatPesoInputValue(pet.peso);
     return `
     <div class="pet-row" data-index="${index}">
+      <button type="button" class="btn btn-ghost btn-small pet-row__remove" data-action="remove-pet">
+        Remover
+      </button>
       <div class="grid g-4 pet-row__grid">
         <label class="field">
           <span>Nome do Pet <strong class="required">*</strong></span>
@@ -263,15 +266,10 @@
           <input type="text" name="pet_raca" value="${pet.raca || ''}" placeholder="Ex.: SRD" />
         </label>
       </div>
-      <div class="pet-row__footer">
-        <label class="field">
-          <span>Observações do pet</span>
-          <textarea name="pet_observacoes" rows="2" placeholder="Alergias, cuidados, notas">${pet.observacoes || ''}</textarea>
-        </label>
-        <div class="pet-row__actions">
-          <button type="button" class="btn btn-ghost btn-small" data-action="remove-pet">Remover</button>
-        </div>
-      </div>
+      <label class="field pet-row__notes">
+        <span>Observações do pet</span>
+        <textarea name="pet_observacoes" rows="2" placeholder="Alergias, cuidados, notas">${pet.observacoes || ''}</textarea>
+      </label>
     </div>
   `;
   };
