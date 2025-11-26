@@ -136,8 +136,14 @@ legend::before {
 
 .table-actions {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.table-actions .btn-small {
+  white-space: nowrap;
 }
 
 .detail-grid {
