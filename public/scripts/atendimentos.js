@@ -205,7 +205,7 @@
       destacarFoco();
     } catch (error) {
       console.error(error);
-      alert('Não foi possível carregar os atendimentos.');
+      Utils.showCustomAlert('Não foi possível carregar os atendimentos.');
     }
   };
 
@@ -328,7 +328,7 @@
       await carregarAtendimentos();
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     }
   };
 
@@ -346,7 +346,7 @@
   const showDetalhes = (id) => {
     const item = atendimentos.find((atd) => atd.id == id);
     if (!item) {
-      alert('Atendimento não encontrado.');
+      Utils.showCustomAlert('Atendimento não encontrado.');
       return;
     }
 
@@ -432,7 +432,7 @@
     };
 
     if (!payload.tutor_nome || !payload.pet_nome || !payload.data || !payload.hora) {
-      alert('Informe tutor, pet, data e hora.');
+      Utils.showCustomAlert('Informe tutor, pet, data e hora.');
       return;
     }
 
@@ -452,10 +452,10 @@
       form.classList.add('form-hidden');
       limparFormulario();
       await carregarAtendimentos();
-      alert('Atendimento salvo com sucesso!');
+      Utils.showCustomAlert('Atendimento salvo com sucesso!');
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     }
   };
 

@@ -559,3 +559,49 @@ tbody tr:hover {
   color: var(--muted);
   font-size: 13px;
 }
+
+/* ---------- Custom Modal ---------- */
+.custom-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.custom-modal-box {
+  background: #0f172a;
+  border: 1px solid rgba(150, 173, 255, 0.2);
+  padding: 24px 30px;
+  border-radius: 18px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  animation: slideUp 0.2s ease;
+}
+
+.custom-modal-message {
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.custom-modal-box .btn {
+  min-width: 100px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

@@ -381,7 +381,7 @@
       atualizarListaTutores();
     } catch (error) {
       console.error(error);
-      alert('Não foi possível carregar os cadastros. Verifique o servidor.');
+      Utils.showCustomAlert('Não foi possível carregar os cadastros. Verifique o servidor.');
     }
   };
 
@@ -442,7 +442,7 @@
     }
 
     if (missing.length) {
-      alert(`Não é possível concluir o cadastro. Faltam: ${missing.join(', ')}.`);
+      Utils.showCustomAlert(`Não é possível concluir o cadastro. Faltam: ${missing.join(', ')}.`);
       return null;
     }
 
@@ -487,10 +487,10 @@
       renderPets([{}]);
       setEditingState(null);
       atualizarClienteLocal(clienteSalvo);
-      alert(`Cliente ${clienteSalvo.codigo} salvo com sucesso!`);
+      Utils.showCustomAlert(`Cliente ${clienteSalvo.codigo} salvo com sucesso!`);
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     } finally {
       btnSalvar?.removeAttribute('disabled');
     }
@@ -499,12 +499,12 @@
   window.buscarClientePorCodigoRapido = () => {
     const codigo = buscaRapidaInput?.value.trim();
     if (!codigo) {
-      alert('Informe um código para buscar.');
+      Utils.showCustomAlert('Informe um código para buscar.');
       return;
     }
     const encontrado = clientes.find((cliente) => cliente.codigo === codigo);
     if (!encontrado) {
-      alert(`Nenhum cliente com o código ${codigo}.`);
+      Utils.showCustomAlert(`Nenhum cliente com o código ${codigo}.`);
       return;
     }
     if (buscaInput) {
@@ -517,7 +517,7 @@
   window.deletarClientePorCodigo = async () => {
     const codigo = buscaRapidaInput?.value.trim();
     if (!codigo) {
-      alert('Informe o código a ser removido.');
+      Utils.showCustomAlert('Informe o código a ser removido.');
       return;
     }
     const confirma = confirm(
@@ -542,10 +542,10 @@
         renderPets([{}]);
         setEditingState(null);
       }
-      alert(`Cliente ${codigo} removido.`);
+      Utils.showCustomAlert(`Cliente ${codigo} removido.`);
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     }
   };
 
@@ -594,7 +594,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     }
   };
 
@@ -707,7 +707,7 @@
       toggleModalDetalhes(true);
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     }
   };
 
@@ -805,7 +805,7 @@
     if (!especie) faltantes.push('Espécie');
 
     if (faltantes.length) {
-      alert(`Preencha: ${faltantes.join(', ')}.`);
+      Utils.showCustomAlert(`Preencha: ${faltantes.join(', ')}.`);
       return;
     }
 
@@ -828,13 +828,13 @@
         throw new Error(info?.error || 'Erro ao salvar pet.');
       }
       await resp.json();
-      alert(`Pet adicionado ao cliente ${codigo}.`);
+      Utils.showCustomAlert(`Pet adicionado ao cliente ${codigo}.`);
       formNovoPet.reset();
       toggleModalPet(false);
       carregarClientes();
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     } finally {
       submitBtn?.removeAttribute('disabled');
     }

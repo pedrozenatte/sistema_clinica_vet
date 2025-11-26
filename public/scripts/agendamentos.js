@@ -267,7 +267,7 @@
       aplicarFiltros();
     } catch (error) {
       console.error(error);
-      alert('Não foi possível carregar os agendamentos.');
+      Utils.showCustomAlert('Não foi possível carregar os agendamentos.');
     }
   };
 
@@ -301,7 +301,7 @@
   const showDetalhes = (id) => {
     const item = agendamentos.find((a) => a.id == id); // tolera string/number
     if (!item) {
-      alert('Agendamento não encontrado.');
+      Utils.showCustomAlert('Agendamento não encontrado.');
       return;
     }
 
@@ -433,7 +433,7 @@
     const tutorNome = (dados.get('tutor') || '').trim();
     const cliente = findCliente(tutorNome);
     if (!cliente) {
-      alert('Selecione um tutor já cadastrado.');
+      Utils.showCustomAlert('Selecione um tutor já cadastrado.');
       return;
     }
     selectedClienteId = cliente.id;
@@ -467,7 +467,7 @@
     };
 
     if (!payload.pet_nome || !payload.tutor_nome || !payload.data || !payload.hora) {
-      alert('Informe tutor, pet, data e hora.');
+      Utils.showCustomAlert('Informe tutor, pet, data e hora.');
       return;
     }
 
@@ -503,10 +503,10 @@
       formAgendamento.classList.add('form-hidden');
       limparFormulario(); 
       
-      alert('Agendamento salvo!');
+      Utils.showCustomAlert('Agendamento salvo!');
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     }
   };
 
@@ -552,7 +552,7 @@
       window.location.href = `/pages/atendimentos.html?focus=${atendimento.id}`;
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     }
   };
 
@@ -572,7 +572,7 @@
         btn.disabled = true; // evita clique duplo
         criarAtendimento(item);
       } else {
-        alert('Este agendamento já está em atendimento ou concluído.');
+        Utils.showCustomAlert('Este agendamento já está em atendimento ou concluído.');
       }
     }
   });
@@ -633,10 +633,10 @@
       limparFormulario();
       formAgendamento.classList.add('form-hidden');
       if (btnNovoAgendamento) btnNovoAgendamento.textContent = 'Novo Agendamento';
-      alert('Agendamento excluído.');
+      Utils.showCustomAlert('Agendamento excluído.');
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     }
   });
 

@@ -121,7 +121,7 @@
       updateStatusDonut(data.statusBuckets);
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      Utils.showCustomAlert(error.message);
     }
   };
 

@@ -83,6 +83,38 @@
     };
   };
 
+  const showCustomAlert = (message) => {
+    // Create modal elements if they don't exist
+    let overlay = document.querySelector('.custom-modal-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'custom-modal-overlay';
+      
+      const box = document.createElement('div');
+      box.className = 'custom-modal-box';
+      
+      const msgP = document.createElement('p');
+      msgP.className = 'custom-modal-message';
+      
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary';
+      btn.textContent = 'Ok';
+      btn.onclick = () => {
+        document.body.removeChild(overlay);
+      };
+      
+      box.appendChild(msgP);
+      box.appendChild(btn);
+      overlay.appendChild(box);
+    }
+    
+    // Set message and append to body
+    const msgP = overlay.querySelector('.custom-modal-message');
+    if (msgP) msgP.textContent = message;
+    
+    document.body.appendChild(overlay);
+  };
+
   window.Utils = {
     formatDate,
     formatTime,
@@ -91,5 +123,6 @@
     slugify,
     renderRows,
     debounce,
+    showCustomAlert,
   };
 })();
