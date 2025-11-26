@@ -7,6 +7,15 @@ const baseSelect = '*,pets ( * )';
 const generateCodigo = () => `CLI-${randomUUID().split('-')[0].toUpperCase()}`;
 
 const sanitizePattern = (value = '') => `%${value}%`.replace(/,/g, '');
+
+const normalizeNumber = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+  const parsed = Number.parseFloat(String(value).replace(',', '.'));
+  return Number.isFinite(parsed) ? parsed : null;
+};
 const pickClienteColumns = (input = {}) => {
   const allowed = [
     'codigo',
@@ -33,7 +42,7 @@ const pickClienteColumns = (input = {}) => {
 };
 
 const pickPetColumns = (input = {}) => {
-  const allowed = ['nome', 'especie', 'raca'];
+  const allowed = ['nome', 'especie', 'raca', 'data_nascimento', 'sexo', 'peso', 'observacoes'];
   return allowed.reduce((acc, key) => {
     const value = input[key];
     if (value !== undefined && value !== null && value !== '') {
@@ -50,6 +59,10 @@ const normalizePets = (input) => {
       nome: (pet?.nome || '').trim(),
       especie: (pet?.especie || '').trim(),
       raca: (pet?.raca || '').trim(),
+      data_nascimento: (pet?.data_nascimento || pet?.nascimento || '').trim(),
+      sexo: (pet?.sexo || '').trim(),
+      peso: normalizeNumber(pet?.peso ?? pet?.peso_kg ?? null),
+      observacoes: (pet?.observacoes || '').trim(),
     }))
     .filter((pet) => pet.nome);
 };
@@ -99,7 +112,7 @@ router.post('/', async (req, res) => {
 
   const codigo = (cliente.codigo || '').trim() || generateCodigo();
   const petsPayload = normalizePets(pets || (pet ? [pet] : []));
-  const payload = pickClienteColumns({ ...cliente, codigo });
+  const payload = pickClienteColumns({ ...cliente, codigo, estado });
 
   const { data, error } = await supabase
     .from('clientes')
@@ -142,7 +155,7 @@ router.put('/:codigo', async (req, res) => {
   }
 
   const petsPayload = normalizePets(pets || (pet ? [pet] : []));
-  const payload = pickClienteColumns(cliente);
+  const payload = pickClienteColumns({ ...cliente, estado });
 
   const { data: existing, error: findError } = await supabase
     .from('clientes')
@@ -190,7 +203,7 @@ router.put('/:codigo', async (req, res) => {
 
 router.post('/:codigo/pets', async (req, res) => {
   const { codigo } = req.params;
-  const { nome, especie, raca } = req.body || {};
+  const { nome, especie, raca, data_nascimento, sexo, peso, nascimento, observacoes } = req.body || {};
 
   if (!nome || !especie) {
     return res.status(400).json({ error: 'Campos obrigatórios: nome, especie.' });
@@ -208,11 +221,17 @@ router.post('/:codigo/pets', async (req, res) => {
 
   const payload = { nome, especie, cliente_id: cliente.id };
   if (raca) payload.raca = raca;
+  const birth = data_nascimento || nascimento;
+  if (birth) payload.data_nascimento = birth;
+  if (sexo) payload.sexo = sexo;
+  const pesoValue = normalizeNumber(peso);
+  if (pesoValue !== null) payload.peso = pesoValue;
+  if (observacoes) payload.observacoes = observacoes;
 
   const { data, error } = await supabase
     .from('pets')
     .insert(payload)
-    .select('id,nome,especie,raca,cliente_id')
+    .select('id,nome,especie,raca,data_nascimento,sexo,peso,observacoes,cliente_id')
     .single();
 
   if (error) {

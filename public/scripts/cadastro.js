@@ -1,11 +1,11 @@
 (() => {
   const tableBody = document.getElementById('cadastrosBody');
+  const petsTableBody = document.getElementById('petsBody');
   const situacaoFiltro = document.getElementById('fSituacao');
   const buscaInput = document.getElementById('fBusca');
   const buscaRapidaInput = document.getElementById('inputBuscaRapida');
   const form = document.getElementById('formCadastro');
   const btnSalvar = document.getElementById('btnSalvarCadastro');
-  const btnSalvarBar = document.getElementById('btnSalvarBar');
   const petsContainer = document.getElementById('petsContainer');
   const btnAddPet = document.getElementById('btnAddPet');
   const btnMostrarForm = document.getElementById('btnMostrarForm');
@@ -21,9 +21,15 @@
   const btnFecharDetalhes = document.getElementById('btnFecharDetalhes');
   const detalhesBody = document.getElementById('detalhesBody');
   const detalhesTitulo = document.getElementById('detalhesTitulo');
+  const toggleLista = document.getElementById('toggleLista');
+  const clientesWrapper = document.getElementById('clientesWrapper');
+  const petsWrapper = document.getElementById('petsWrapper');
+  const listaViewLabel = document.getElementById('listaViewLabel');
 
   const clientes = [];
+  let petsCache = [];
   let editingCodigo = null;
+  let currentView = 'clientes';
 
   const requiredFields = [
     { name: 'nome', label: 'Nome completo' },
@@ -41,7 +47,7 @@
   const statusPill = (status) =>
     `<span class="badge ${status === 'Ativo' ? 'badge-success' : 'badge-neutral'}">${status}</span>`;
 
-  const render = (data) => {
+  const renderClientes = (data) => {
     if (!tableBody) return;
     const rows = data.map((cliente) => {
       const contato = Utils.formatPhone(cliente.telefone);
@@ -67,17 +73,56 @@
     Utils.renderRows(tableBody, rows, 9, 'Nenhum cadastro encontrado.');
   };
 
+  const renderPetsTable = (lista) => {
+    if (!petsTableBody) return;
+    const rows = lista.map((pet) => {
+      const nascimento = pet.data_nascimento ? Utils.formatDate(pet.data_nascimento) : '—';
+      const contato = Utils.formatPhone(pet.contato || '');
+      return `
+        <tr>
+          <td>${pet.nome || '—'}</td>
+          <td>${pet.especie || '—'}</td>
+          <td>${pet.raca || '—'}</td>
+          <td>${pet.sexo || '—'}</td>
+          <td>${nascimento}</td>
+          <td>${pet.tutor || '—'}${pet.tutorCodigo ? ` (${pet.tutorCodigo})` : ''}</td>
+          <td>${contato || '—'}</td>
+          <td>${statusPill(pet.situacao || 'Ativo')}</td>
+          <td>
+            <button type="button" class="btn btn-ghost btn-small" data-action="view" data-codigo="${pet.tutorCodigo}">
+              Ver tutor
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    Utils.renderRows(petsTableBody, rows, 9, 'Nenhum pet encontrado.');
+  };
+
   const normalizar = (texto = '') =>
     texto
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase();
 
+  const rebuildPetsCache = () => {
+    petsCache = clientes.flatMap((cliente) =>
+      (cliente.pets || []).map((pet) => ({
+        ...pet,
+        tutor: cliente.nome,
+        tutorCodigo: cliente.codigo,
+        contato: cliente.telefone,
+        situacao: cliente.situacao || 'Ativo',
+      })),
+    );
+  };
+
   const filtrar = () => {
     const situacao = situacaoFiltro?.value || '';
     const termo = normalizar(buscaInput?.value || '');
 
-    const resultado = clientes.filter((cliente) => {
+    const resultadoClientes = clientes.filter((cliente) => {
       if (situacao && cliente.situacao !== situacao) return false;
       if (!termo) return true;
       const alvo = [
@@ -93,7 +138,21 @@
       return alvo.includes(termo);
     });
 
-    render(resultado);
+    const resultadoPets = petsCache.filter((pet) => {
+      if (situacao && pet.situacao !== situacao) return false;
+      if (!termo) return true;
+      const alvo = [pet.nome, pet.especie, pet.raca, pet.sexo, pet.tutor, pet.tutorCodigo]
+        .filter(Boolean)
+        .map(normalizar)
+        .join(' ');
+      return alvo.includes(termo);
+    });
+
+    if (currentView === 'clientes') {
+      renderClientes(resultadoClientes);
+    } else {
+      renderPetsTable(resultadoPets);
+    }
   };
 
   const filtrarDebounced = Utils.debounce(filtrar, 200);
@@ -101,9 +160,74 @@
   situacaoFiltro?.addEventListener('change', filtrar);
   buscaInput?.addEventListener('input', filtrarDebounced);
 
-  const petRowTemplate = (pet = {}, index = 0) => `
+  const updateViewLabel = () => {
+    if (listaViewLabel) {
+      listaViewLabel.textContent =
+        currentView === 'clientes' ? 'Visualizando clientes' : 'Visualizando pets';
+    }
+    if (buscaInput) {
+      buscaInput.placeholder =
+        currentView === 'clientes'
+          ? 'Nome, CPF, e-mail, cidade...'
+          : 'Nome do pet, tutor, espécie...';
+    }
+  };
+
+  const toggleTableVisibility = () => {
+    clientesWrapper?.toggleAttribute('hidden', currentView !== 'clientes');
+    petsWrapper?.toggleAttribute('hidden', currentView !== 'pets');
+  };
+
+  const setView = (view) => {
+    currentView = view;
+    if (toggleLista) {
+      toggleLista.checked = view === 'pets';
+    }
+    updateViewLabel();
+    toggleTableVisibility();
+    filtrar();
+  };
+
+  toggleLista?.addEventListener('change', (event) => {
+    setView(event.target.checked ? 'pets' : 'clientes');
+  });
+
+  const normalizeDateInput = (value = '') => {
+    if (!value) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return '';
+    return parsed.toISOString().slice(0, 10);
+  };
+
+  const parsePesoInput = (value = '') => {
+    if (value === null || value === undefined || value === '') return null;
+    const raw =
+      typeof value === 'number' ? value : Number.parseFloat(String(value).replace(',', '.'));
+    if (Number.isNaN(raw)) return null;
+    return Math.round(raw * 1000) / 1000;
+  };
+
+  const formatPesoInputValue = (value = '') => {
+    const parsed = parsePesoInput(value);
+    if (parsed === null) return '';
+    return parsed.toString();
+  };
+
+  const formatPesoLabel = (value = '') => {
+    const parsed = parsePesoInput(value);
+    if (parsed === null) return '';
+    const text = Number.isInteger(parsed) ? parsed.toString() : parsed.toFixed(2);
+    return `${text.replace(/\.?0+$/, '')} kg`;
+  };
+
+  const petRowTemplate = (pet = {}, index = 0) => {
+    const nascimento = normalizeDateInput(pet.nascimento || pet.data_nascimento || '');
+    const sexo = (pet.sexo || '').trim();
+    const peso = formatPesoInputValue(pet.peso);
+    return `
     <div class="pet-row" data-index="${index}">
-      <div class="grid g-4">
+      <div class="grid g-4 pet-row__grid">
         <label class="field">
           <span>Nome do Pet <strong class="required">*</strong></span>
           <input type="text" name="pet_nome" value="${pet.nome || ''}" placeholder="Ex.: Luna" />
@@ -117,9 +241,32 @@
             <option ${pet.especie === 'Outros' ? 'selected' : ''}>Outros</option>
           </select>
         </label>
-        <label class="field field-2">
+        <label class="field">
+          <span>Sexo</span>
+          <select name="pet_sexo">
+            <option value="" ${!sexo ? 'selected' : ''}>Selecione</option>
+            <option value="Macho" ${sexo === 'Macho' ? 'selected' : ''}>Macho</option>
+            <option value="Fêmea" ${sexo === 'Fêmea' ? 'selected' : ''}>Fêmea</option>
+            <option value="Outro" ${sexo === 'Outro' ? 'selected' : ''}>Outro</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Peso (kg)</span>
+          <input type="number" name="pet_peso" min="0" step="0.01" value="${peso}" placeholder="Ex.: 8.5" />
+        </label>
+        <label class="field">
+          <span>Data de nascimento</span>
+          <input type="date" name="pet_nascimento" value="${nascimento}" />
+        </label>
+        <label class="field">
           <span>Raça</span>
           <input type="text" name="pet_raca" value="${pet.raca || ''}" placeholder="Ex.: SRD" />
+        </label>
+      </div>
+      <div class="pet-row__footer">
+        <label class="field">
+          <span>Observações do pet</span>
+          <textarea name="pet_observacoes" rows="2" placeholder="Alergias, cuidados, notas">${pet.observacoes || ''}</textarea>
         </label>
         <div class="pet-row__actions">
           <button type="button" class="btn btn-ghost btn-small" data-action="remove-pet">Remover</button>
@@ -127,6 +274,7 @@
       </div>
     </div>
   `;
+  };
 
   const renderPets = (pets = []) => {
     if (!petsContainer) return;
@@ -142,8 +290,18 @@
         const nome = row.querySelector('input[name="pet_nome"]')?.value.trim() || '';
         const especie = row.querySelector('select[name="pet_especie"]')?.value.trim() || '';
         const raca = row.querySelector('input[name="pet_raca"]')?.value.trim() || '';
+        const nascimento = row.querySelector('input[name="pet_nascimento"]')?.value.trim() || '';
+        const sexo = row.querySelector('select[name="pet_sexo"]')?.value.trim() || '';
+        const pesoValue = row.querySelector('input[name="pet_peso"]')?.value.trim() || '';
+        const peso = parsePesoInput(pesoValue);
+        const observacoes = row.querySelector('textarea[name="pet_observacoes"]')?.value.trim() || '';
         if (!nome && !especie) return null;
-        return { nome, especie, raca };
+        const petData = { nome, especie, raca };
+        if (nascimento) petData.data_nascimento = nascimento;
+        if (sexo) petData.sexo = sexo;
+        if (peso !== null) petData.peso = peso;
+        if (observacoes) petData.observacoes = observacoes;
+        return petData;
       })
       .filter(Boolean);
   };
@@ -159,9 +317,6 @@
     editingCodigo = cliente?.codigo || null;
     if (btnSalvar) {
       btnSalvar.textContent = editingCodigo ? 'Atualizar' : 'Salvar';
-    }
-    if (btnSalvarBar) {
-      btnSalvarBar.textContent = editingCodigo ? 'Atualizar cadastro' : 'Salvar cadastro';
     }
   };
 
@@ -180,6 +335,7 @@
       if (!resp.ok) throw new Error('Falha ao buscar cadastros.');
       const data = await resp.json();
       clientes.splice(0, clientes.length, ...data);
+      rebuildPetsCache();
       filtrar();
       atualizarListaTutores();
     } catch (error) {
@@ -261,6 +417,7 @@
     } else {
       clientes.unshift(cliente);
     }
+    rebuildPetsCache();
     filtrar();
     highlightRow(cliente.codigo);
   };
@@ -270,7 +427,6 @@
     if (!payload) return;
 
     btnSalvar?.setAttribute('disabled', 'disabled');
-    btnSalvarBar?.setAttribute('disabled', 'disabled');
 
     const method = editingCodigo ? 'PUT' : 'POST';
     const url = editingCodigo ? `/api/clientes/${editingCodigo}` : '/api/clientes';
@@ -296,7 +452,6 @@
       alert(error.message);
     } finally {
       btnSalvar?.removeAttribute('disabled');
-      btnSalvarBar?.removeAttribute('disabled');
     }
   };
 
@@ -338,6 +493,7 @@
       const index = clientes.findIndex((cliente) => cliente.codigo === codigo);
       if (index >= 0) {
         clientes.splice(index, 1);
+        rebuildPetsCache();
         filtrar();
       }
       if (editingCodigo === codigo) {
@@ -403,7 +559,7 @@
 
   const renderDetalhes = (cliente) => {
     if (!detalhesBody || !detalhesTitulo) return;
-    detalhesTitulo.textContent = `${cliente.nome || 'Cliente'} — ${cliente.codigo || ''}`;
+    detalhesTitulo.textContent = cliente.nome || 'Cliente';
 
     const endereco = [
       cliente.rua,
@@ -419,49 +575,79 @@
       .join(', ');
 
     const petsLista = (cliente.pets || []).map((pet) => {
-      const detalhes = [pet.especie, pet.raca].filter(Boolean).join(' — ');
-      return `<li><strong>${pet.nome}</strong>${detalhes ? ` (${detalhes})` : ''}</li>`;
+      const nascimento = pet.nascimento || pet.data_nascimento;
+      const pesoLabel = formatPesoLabel(pet.peso);
+      return `
+        <article class="pet-card">
+          <header>
+            <div>
+              <strong>${pet.nome || 'Pet'}</strong>
+              <span>${pet.especie || '—'}${pet.raca ? ` · ${pet.raca}` : ''}</span>
+            </div>
+            <span class="badge badge-neutral">${pet.sexo || '—'}</span>
+          </header>
+          <dl>
+            <div>
+              <dt>Nascimento</dt>
+              <dd>${nascimento ? Utils.formatDate(nascimento) : '—'}</dd>
+            </div>
+            <div>
+              <dt>Peso</dt>
+              <dd>${pesoLabel || '—'}</dd>
+            </div>
+          </dl>
+          ${
+            pet.observacoes
+              ? `<p class="pet-card__notes">${pet.observacoes}</p>`
+              : ''
+          }
+        </article>
+      `;
     });
 
     detalhesBody.innerHTML = `
-      <div class="detail-grid">
-        <div>
-          <span class="detail-label">Código</span>
-          <strong class="detail-value">${cliente.codigo || '—'}</strong>
+      <section class="detail-section">
+        <header class="detail-section__header">
+          <h3>Dados do cliente</h3>
+          <span class="badge ${cliente.situacao === 'Ativo' ? 'badge-success' : 'badge-neutral'}">
+            ${cliente.situacao || '—'}
+          </span>
+        </header>
+        <div class="detail-grid">
+          <div>
+            <span class="detail-label">Código</span>
+            <strong class="detail-value">${cliente.codigo || '—'}</strong>
+          </div>
+          <div>
+            <span class="detail-label">CPF</span>
+            <strong class="detail-value">${cliente.cpf || '—'}</strong>
+          </div>
+          <div>
+            <span class="detail-label">Telefone</span>
+            <strong class="detail-value">${Utils.formatPhone(cliente.telefone || '') || '—'}</strong>
+          </div>
+          <div>
+            <span class="detail-label">E-mail</span>
+            <strong class="detail-value">${cliente.email || '—'}</strong>
+          </div>
+          <div class="detail-full">
+            <span class="detail-label">Endereço</span>
+            <strong class="detail-value">${endereco || '—'}</strong>
+          </div>
         </div>
-        <div>
-          <span class="detail-label">Situação</span>
-          <strong class="detail-value">${cliente.situacao || '—'}</strong>
-        </div>
-        <div class="detail-full">
-          <span class="detail-label">Nome</span>
-          <strong class="detail-value">${cliente.nome || '—'}</strong>
-        </div>
-        <div>
-          <span class="detail-label">CPF</span>
-          <strong class="detail-value">${cliente.cpf || '—'}</strong>
-        </div>
-        <div>
-          <span class="detail-label">Telefone</span>
-          <strong class="detail-value">${Utils.formatPhone(cliente.telefone || '') || '—'}</strong>
-        </div>
-        <div class="detail-full">
-          <span class="detail-label">E-mail</span>
-          <strong class="detail-value">${cliente.email || '—'}</strong>
-        </div>
-        <div class="detail-full">
-          <span class="detail-label">Endereço</span>
-          <strong class="detail-value">${endereco || '—'}</strong>
-        </div>
-        <div class="detail-full">
-          <span class="detail-label">Pets</span>
-          ${
-            petsLista.length
-              ? `<ul class="detail-list">${petsLista.join('')}</ul>`
-              : '<strong class="detail-value">—</strong>'
-          }
-        </div>
-      </div>
+      </section>
+
+      <section class="detail-section">
+        <header class="detail-section__header">
+          <h3>Pets cadastrados</h3>
+          <span class="muted small">${petsLista.length} registros</span>
+        </header>
+        ${
+          petsLista.length
+            ? `<div class="pets-grid">${petsLista.join('')}</div>`
+            : '<p class="muted">Nenhum pet vinculado.</p>'
+        }
+      </section>
     `;
   };
 
@@ -484,7 +670,7 @@
     }
   };
 
-  tableBody?.addEventListener('click', (event) => {
+  const handleTableClick = (event) => {
     const btn = event.target.closest('button[data-codigo]');
     if (!btn) return;
     event.preventDefault();
@@ -495,7 +681,10 @@
     } else {
       carregarClienteParaEdicao(codigo);
     }
-  });
+  };
+
+  tableBody?.addEventListener('click', handleTableClick);
+  petsTableBody?.addEventListener('click', handleTableClick);
 
   form?.addEventListener('reset', () => {
     setEditingState(null);
@@ -534,7 +723,6 @@
   });
 
   btnSalvar?.addEventListener('click', salvarCliente);
-  btnSalvarBar?.addEventListener('click', salvarCliente);
   btnAddPet?.addEventListener('click', () => {
     const currentPets = collectPets();
     currentPets.push({});
@@ -565,6 +753,10 @@
     const nome = (data.get('pet_nome') || '').trim();
     const especie = (data.get('pet_especie') || '').trim();
     const raca = (data.get('pet_raca') || '').trim();
+    const nascimento = (data.get('pet_nascimento') || '').trim();
+    const sexo = (data.get('pet_sexo') || '').trim();
+    const peso = parsePesoInput(data.get('pet_peso'));
+    const observacoesPet = (data.get('pet_observacoes') || '').trim();
 
     const faltantes = [];
     if (!codigo) faltantes.push('Código do tutor');
@@ -580,10 +772,15 @@
     submitBtn?.setAttribute('disabled', 'disabled');
 
     try {
+      const payload = { nome, especie, raca };
+      if (nascimento) payload.data_nascimento = nascimento;
+      if (sexo) payload.sexo = sexo;
+      if (peso !== null) payload.peso = peso;
+      if (observacoesPet) payload.observacoes = observacoesPet;
       const resp = await fetch(`/api/clientes/${codigo}/pets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, especie, raca }),
+        body: JSON.stringify(payload),
       });
       if (!resp.ok) {
         const info = await resp.json();
@@ -633,6 +830,7 @@
     return match ? match[1] : valor.trim();
   };
 
+  setView('clientes');
   carregarClientes();
   ensureAtLeastOnePetRow();
 })();

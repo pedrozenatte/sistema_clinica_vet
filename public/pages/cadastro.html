@@ -183,19 +183,6 @@
           </div>
         </fieldset>
 
-        <!-- OBSERVAÇÕES -->
-        <fieldset class="card">
-          <legend>Observações</legend>
-          <label class="field">
-            <span>Observações gerais</span>
-            <textarea
-              rows="4"
-              name="observacoes"
-              placeholder="Alergias, restrições, preferência de contato..."
-            ></textarea>
-          </label>
-        </fieldset>
-
         <!-- AÇÕES -->
         <div class="form-actions">
           <button type="reset" class="btn btn-ghost">Limpar</button>
@@ -207,44 +194,49 @@
         </div>
       </form>
 
-      <aside class="form-save-bar" aria-live="polite">
-        <div class="form-save-bar__content">
-          <div>
-            <strong>Finalizou o cadastro?</strong>
-            <p class="muted small">Revise os dados e confirme o cadastro.</p>
-          </div>
-          <div class="form-save-bar__actions">
-            <button class="btn btn-primary" id="btnSalvarBar" type="button">Salvar cadastro</button>
-          </div>
-        </div>
-      </aside>
       </div>
 
       <!-- LISTA DE PESSOAS CADASTRADAS -->
       <section class="card" id="lista-cadastros">
         <header class="list-header">
-          <h2 class="card-title">Pessoas Cadastradas</h2>
-          <div class="list-filters">
-            <label class="field">
-              <span>Situação</span>
-              <select id="fSituacao">
-                <option value="">Todas</option>
-                <option value="Ativo">Ativo</option>
-                <option value="Inativo">Inativo</option>
-              </select>
-            </label>
-            <label class="field field-search">
-              <span>Buscar</span>
-              <input
-                id="fBusca"
-                type="search"
-                placeholder="Nome, CPF, e-mail, cidade..."
-              />
-            </label>
+          <div class="list-header__left">
+            <h2 class="card-title">Cadastros</h2>
+            <p class="muted small" id="listaViewLabel">Visualizando clientes</p>
+          </div>
+          <div class="list-header__right">
+            <div class="list-toggle">
+              <span>Visualizar</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleLista" aria-label="Alternar entre clientes e pets" />
+                <span class="toggle-switch__track">
+                  <span class="toggle-switch__option">Clientes</span>
+                  <span class="toggle-switch__option">Pets</span>
+                  <span class="toggle-switch__thumb"></span>
+                </span>
+              </label>
+            </div>
+            <div class="list-filters">
+              <label class="field">
+                <span>Situação</span>
+                <select id="fSituacao">
+                  <option value="">Todas</option>
+                  <option value="Ativo">Ativo</option>
+                  <option value="Inativo">Inativo</option>
+                </select>
+              </label>
+              <label class="field field-search">
+                <span>Buscar</span>
+                <input
+                  id="fBusca"
+                  type="search"
+                  placeholder="Nome, CPF, e-mail, cidade..."
+                />
+              </label>
+            </div>
           </div>
         </header>
 
-        <div class="table-wrapper">
+        <div class="table-wrapper" id="clientesWrapper">
           <table
             class="cadastro-table"
             aria-label="Lista de pessoas cadastradas"
@@ -266,6 +258,24 @@
             </tbody>
           </table>
         </div>
+        <div class="table-wrapper" id="petsWrapper" hidden>
+          <table class="cadastro-table" aria-label="Lista de pets cadastrados">
+            <thead>
+              <tr>
+                <th>Pet</th>
+                <th>Espécie</th>
+                <th>Raça</th>
+                <th>Sexo</th>
+              <th>Nascimento</th>
+              <th>Tutor</th>
+              <th>Contato</th>
+              <th>Situação</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="petsBody"></tbody>
+        </table>
+      </div>
 
         <div class="list-foot">
           <small class="muted"
@@ -295,7 +305,7 @@
             <input type="text" name="codigo" placeholder="CLI-1234 ou nome" list="listaTutores" required />
             <datalist id="listaTutores"></datalist>
           </label>
-          <div class="grid g-3">
+          <div class="grid g-5">
             <label class="field">
               <span>Nome do Pet <strong class="required">*</strong></span>
               <input type="text" name="pet_nome" placeholder="Ex.: Luna" required />
@@ -311,10 +321,31 @@
               </select>
             </label>
             <label class="field">
+              <span>Sexo</span>
+              <select name="pet_sexo">
+                <option value="">Selecione</option>
+                <option>Macho</option>
+                <option>Fêmea</option>
+                <option>Outro</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Peso (kg)</span>
+              <input type="number" name="pet_peso" min="0" step="0.01" placeholder="Ex.: 8.5" />
+            </label>
+            <label class="field">
+              <span>Data de nascimento</span>
+              <input type="date" name="pet_nascimento" />
+            </label>
+            <label class="field">
               <span>Raça</span>
               <input type="text" name="pet_raca" placeholder="Ex.: SRD" />
             </label>
           </div>
+          <label class="field">
+            <span>Observações do pet</span>
+            <textarea name="pet_observacoes" rows="2" placeholder="Alergias, cuidados, preferências"></textarea>
+          </label>
           <div class="form-actions">
             <div class="spacer"></div>
             <button type="button" class="btn btn-ghost" id="btnCancelarModalPet">Cancelar</button>
