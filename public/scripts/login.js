@@ -7,8 +7,7 @@
 
   let mode = 'login'; // 'login' | 'signup'
 
-  const params = new URLSearchParams(window.location.search);
-  const redirect = params.get('redirect') || '/pages/dashboard.html';
+  const redirect = '/pages/dashboard.html';
 
   const setMode = (nextMode) => {
     mode = nextMode;
