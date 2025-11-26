@@ -1,10 +1,8 @@
 (() => {
   const tableProximos = document.getElementById('proximosBody');
   const tableAgenda = document.getElementById('agendaBody');
-  const filtroDataDe = document.getElementById('agendaDataDe');
-  const filtroDataAte = document.getElementById('agendaDataAte');
-  const filtroStatus = document.getElementById('agendaStatus');
-  const filtroBusca = document.getElementById('agendaBusca');
+  const filtroEspecie = document.getElementById('agendaEspecie');
+  const filtroPeriodo = document.getElementById('agendaPeriodo');
   const agendaCountLabel = document.getElementById('agendaCount');
   
   const formAgendamento = document.querySelector('#formAgendamentoWrapper'); 
@@ -25,8 +23,10 @@
   const detalhesBody = document.getElementById('detalhesBody');
   
   let agendamentos = [];
-  let clientesData = []; 
-  let editingId = null; // Tracks the ID being edited
+  let clientesData = [];
+  let editingId = null;
+  let selectedClienteId = null;
+  let selectedPetId = null;
 
   const badgeClass = (status) => {
     const map = {
@@ -77,6 +77,21 @@
     return normalized || '--';
   };
 
+  const resetSelections = () => {
+    selectedClienteId = null;
+    selectedPetId = null;
+  };
+
+  const getClienteByNome = (nome = '') => {
+    if (!nome) return null;
+    return clientesData.find((c) => (c.nome || '').toLowerCase() === nome.toLowerCase());
+  };
+
+  const getPetFromCliente = (cliente, petNome = '') => {
+    if (!cliente || !Array.isArray(cliente.pets)) return null;
+    return cliente.pets.find((p) => (p.nome || '').toLowerCase() === petNome.toLowerCase());
+  };
+
   const renderProximos = () => {
     if (!tableProximos) return;
     const agora = new Date();
@@ -97,7 +112,7 @@
         <td>${item.pet_nome}</td>
         <td>${item.tutor_nome}</td>
         <td>${item.servico}</td>
-        <td>${item.veterinario}</td>
+        <td>${item.veterinario || '—'}</td>
         <td><span class="badge ${badgeClass(item.status)}">${item.status}</span></td>
       </tr>
     `);
@@ -109,8 +124,10 @@
     if (!tableAgenda) return;
     const rows = data
       .sort((a, b) => `${a.data} ${a.hora}`.localeCompare(`${b.data} ${b.hora}`))
-      .map((item) => `
-        <tr>
+      .map((item) => {
+        const podeAtender = !['Cancelado', 'Faltou'].includes(item.status);
+        return `
+        <tr data-id="${item.id}">
           <td>${displayDate(item.data)}</td>
           <td>${displayTime(item.hora)}</td>
           <td>${item.pet_nome} (${item.especie || '—'})</td>
@@ -123,37 +140,33 @@
             <div class="table-actions">
               <button class="btn-small btn-small-ghost" data-id="${item.id}" data-action="ver">Ver</button>
               <button class="btn-small" data-id="${item.id}" data-action="editar">Editar</button>
+              <button class="btn-small" data-id="${item.id}" data-action="atender" ${podeAtender ? '' : 'disabled'}>
+                Atender
+              </button>
             </div>
           </td>
         </tr>
-      `);
+      `;
+      });
 
     Utils.renderRows(tableAgenda, rows, 9, 'Nenhum agendamento encontrado.');
   };
 
-  const normalizar = (valor = '') =>
-    valor
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-
   const aplicarFiltros = () => {
-    const inicio = filtroDataDe?.value ? new Date(`${filtroDataDe.value}T00:00:00`) : null;
-    const fim = filtroDataAte?.value ? new Date(`${filtroDataAte.value}T23:59:59`) : null;
-    const status = filtroStatus?.value || '';
-    const busca = normalizar(filtroBusca?.value || '');
+    const especieFiltro = (filtroEspecie?.value || '').toLowerCase();
+    const periodoDias = parseInt(filtroPeriodo?.value || '', 10);
+    const hoje = new Date();
+    const inicio =
+      !Number.isNaN(periodoDias) && periodoDias > 0
+        ? new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - periodoDias)
+        : null;
 
     const filtrados = agendamentos.filter((item) => {
       const dataAtual = getDateTime(item);
       if (Number.isNaN(dataAtual)) return false;
       if (inicio && dataAtual < inicio) return false;
-      if (fim && dataAtual > fim) return false;
-      if (status && item.status !== status) return false;
-      if (!busca) return true;
-      const alvo = [item.pet_nome, item.tutor_nome, item.servico, item.veterinario]
-        .map(normalizar)
-        .join(' ');
-      return alvo.includes(busca);
+      if (especieFiltro && (item.especie || '').toLowerCase() !== especieFiltro) return false;
+      return true;
     });
 
     renderAgenda(filtrados);
@@ -185,7 +198,7 @@
       clientesData = await resp.json();
       if (listTutores) {
         listTutores.innerHTML = clientesData
-          .map(c => `<option value="${c.nome}">${c.cpf ? `CPF: ${c.cpf}` : ''}</option>`)
+          .map((c) => `<option value="${c.nome}">${c.codigo || ''}</option>`)
           .join('');
       }
     } catch (error) {
@@ -231,23 +244,38 @@
 
   // --- Edit Logic ---
   const startEditing = (id) => {
-    const item = agendamentos.find(a => a.id == id);
+    const item = agendamentos.find((a) => a.id == id);
     if (!item) return;
 
-    // 1. Open form if closed
     if (formAgendamento.classList.contains('form-hidden')) {
-        formAgendamento.classList.remove('form-hidden');
-        btnNovoAgendamento.textContent = 'Cancelar Edição';
+      formAgendamento.classList.remove('form-hidden');
+      btnNovoAgendamento.textContent = 'Cancelar Edição';
     }
 
-    // 2. Populate fields
     editingId = id;
     if (formTitle) formTitle.textContent = 'Editar Agendamento';
-    
+
     const f = formAgendamento;
-    f.querySelector('[name="tutor"]').value = item.tutor_nome || '';
-    f.querySelector('[name="pet"]').value = item.pet_nome || '';
-    f.querySelector('[name="especie"]').value = item.especie || 'Canina';
+    const tutorInput = f.querySelector('[name="tutor"]');
+    const petInput = f.querySelector('[name="pet"]');
+    const especieSelect = f.querySelector('[name="especie"]');
+
+    const cliente = getClienteByNome(item.tutor_nome || '');
+    selectedClienteId = item.cliente_id || cliente?.id || null;
+    if (listPets) {
+      if (cliente && Array.isArray(cliente.pets)) {
+        listPets.innerHTML = cliente.pets
+          .map((p) => `<option value="${p.nome}">${p.especie || ''}</option>`)
+          .join('');
+      } else {
+        listPets.innerHTML = '';
+      }
+    }
+    selectedPetId = item.pet_id || getPetFromCliente(cliente, item.pet_nome || '')?.id || null;
+
+    if (tutorInput) tutorInput.value = item.tutor_nome || '';
+    if (petInput) petInput.value = item.pet_nome || '';
+    if (especieSelect) especieSelect.value = item.especie || 'Canina';
     f.querySelector('[name="servico"]').value = item.servico || 'Consulta';
     f.querySelector('[name="veterinario"]').value = item.veterinario || '';
     f.querySelector('[name="data"]').value = normalizeDateValue(item.data) || '';
@@ -258,22 +286,21 @@
     f.querySelector('[name="status"]').value = item.status || 'Agendado';
     f.querySelector('[name="canal"]').value = item.canal || 'Telefone';
     f.querySelector('[name="obs"]').value = item.observacoes || '';
-    
-    // Scroll to form
+
     formAgendamento.scrollIntoView({ behavior: 'smooth' });
   };
 
   const limparFormulario = () => {
     if (!formAgendamento) return;
     formAgendamento.reset();
+    resetSelections();
     editingId = null;
     if (formTitle) formTitle.textContent = 'Novo Agendamento';
     if (btnNovoAgendamento) {
-        // Reset button text based on visibility
-        const isHidden = formAgendamento.classList.contains('form-hidden');
-        btnNovoAgendamento.textContent = isHidden ? 'Novo Agendamento' : 'Esconder Formulário';
+      const isHidden = formAgendamento.classList.contains('form-hidden');
+      btnNovoAgendamento.textContent = isHidden ? 'Novo Agendamento' : 'Esconder Formulário';
     }
-    // Clear specific inputs manually if reset() doesn't catch them all (though it should)
+    if (listPets) listPets.innerHTML = '';
   };
 
   const onSubmit = async (event) => {
@@ -292,6 +319,8 @@
     const horaValor = normalizeTimeValue(dados.get('hora'));
 
     const payload = {
+      cliente_id: selectedClienteId,
+      pet_id: selectedPetId,
       tutor_nome: dados.get('tutor') || '',
       pet_nome: dados.get('pet') || '',
       especie: dados.get('especie') || '',
@@ -305,7 +334,7 @@
       status: dados.get('status') || 'Agendado',
       canal: dados.get('canal') || 'Telefone',
       observacoes: dados.get('obs') || '',
-      contato: getContact(), 
+      contato: getContact(),
       destaque: true,
     };
 
@@ -353,17 +382,65 @@
   // --- Event Listeners ---
 
   // 1. Table Actions (Ver / Editar)
-  tableAgenda?.addEventListener('click', (e) => {
-      const btn = e.target.closest('button[data-action]');
-      if (!btn) return;
-      const action = btn.dataset.action;
-      const id = btn.dataset.id;
+  const criarAtendimento = async (agendamento) => {
+    const payload = {
+      agendamento_id: agendamento.id,
+      cliente_id: agendamento.cliente_id,
+      pet_id: agendamento.pet_id,
+      tutor_nome: agendamento.tutor_nome,
+      pet_nome: agendamento.pet_nome,
+      especie: agendamento.especie,
+      veterinario: agendamento.veterinario,
+      tipo: agendamento.tipo || 'Consulta',
+      status: 'Em atendimento',
+      data: normalizeDateValue(agendamento.data),
+      hora: normalizeTimeValue(agendamento.hora),
+      anamnese: '',
+      exame_obs: '',
+      hipoteses: '',
+      exames: '',
+      prescricao: [],
+    };
 
-      if (action === 'ver') {
-          showDetalhes(id);
-      } else if (action === 'editar') {
-          startEditing(id);
+    try {
+      const resp = await fetch('/api/atendimentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!resp.ok) {
+        const info = await resp.json();
+        throw new Error(info?.error || 'Erro ao criar atendimento.');
       }
+      const atendimento = await resp.json();
+      await fetch(`/api/agendamentos/${agendamento.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Compareceu' }),
+      });
+      window.location.href = `/pages/atendimentos.html?focus=${atendimento.id}`;
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
+
+  tableAgenda?.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+
+    if (action === 'ver') {
+      showDetalhes(id);
+    } else if (action === 'editar') {
+      startEditing(id);
+    } else if (action === 'atender') {
+      const item = agendamentos.find((a) => a.id == id);
+      if (item) {
+        criarAtendimento(item);
+      }
+    }
   });
 
   // 2. Form Toggle
@@ -400,43 +477,46 @@
   // 4. Auto-complete logic (simplified from previous step)
   if (inputTutor) {
     inputTutor.addEventListener('input', () => {
-      const name = inputTutor.value;
-      const client = clientesData.find(c => c.nome === name);
-      
-      // Reset pet fields
+      const client = getClienteByNome(inputTutor.value);
+      selectedClienteId = client?.id || null;
+      selectedPetId = null;
+
       if (inputPet) inputPet.value = '';
       if (listPets) listPets.innerHTML = '';
       if (inputEspecie) inputEspecie.value = '';
 
-      if (client && client.pets && client.pets.length > 0) {
-          if (listPets) {
-             listPets.innerHTML = client.pets.map(p => `<option value="${p.nome}">${p.especie}</option>`).join('');
-          }
-          if (client.pets.length === 1 && inputPet) {
-             inputPet.value = client.pets[0].nome;
-             inputPet.dispatchEvent(new Event('input'));
-          }
+      if (client && Array.isArray(client.pets) && client.pets.length > 0) {
+        if (listPets) {
+          listPets.innerHTML = client.pets
+            .map((p) => `<option value="${p.nome}">${p.especie || ''}</option>`)
+            .join('');
+        }
+        if (client.pets.length === 1 && inputPet) {
+          inputPet.value = client.pets[0].nome;
+          inputPet.dispatchEvent(new Event('input'));
+        }
       }
     });
   }
-  
+
   if (inputPet) {
-      inputPet.addEventListener('input', () => {
-          const tutorName = inputTutor.value;
-          const client = clientesData.find(c => c.nome === tutorName);
-          if (!client) return;
-          const pet = client.pets.find(p => p.nome === inputPet.value);
-          if (pet && inputEspecie) {
-              // Try to set species
-              inputEspecie.value = pet.especie; // Simplified for now
-          }
-      });
+    inputPet.addEventListener('input', () => {
+      const tutorName = inputTutor?.value || '';
+      const client = getClienteByNome(tutorName);
+      if (!client) {
+        selectedPetId = null;
+        return;
+      }
+      const pet = getPetFromCliente(client, inputPet.value);
+      selectedPetId = pet?.id || null;
+      if (pet && inputEspecie) {
+        inputEspecie.value = pet.especie || '';
+      }
+    });
   }
 
-  filtroDataDe?.addEventListener('change', aplicarFiltros);
-  filtroDataAte?.addEventListener('change', aplicarFiltros);
-  filtroStatus?.addEventListener('change', aplicarFiltros);
-  filtroBusca?.addEventListener('input', Utils.debounce(aplicarFiltros, 200));
+  filtroEspecie?.addEventListener('change', aplicarFiltros);
+  filtroPeriodo?.addEventListener('change', aplicarFiltros);
   formAgendamento?.addEventListener('submit', onSubmit);
 
   // Initial loads

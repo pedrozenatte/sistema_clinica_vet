@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabaseClient.js';
 const router = Router();
 
 const selectFields =
-  'id,data,hora,pet_nome,especie,tutor_nome,servico,veterinario,status,contato,destaque,observacoes,canal,duracao,tipo,prioridade';
+  'id,cliente_id,pet_id,data,hora,pet_nome,especie,tutor_nome,servico,veterinario,status,contato,destaque,observacoes,canal,duracao,tipo,prioridade';
 
 const sanitizePattern = (value = '') => `%${value}%`.replace(/,/g, '');
 
@@ -42,6 +42,15 @@ router.get('/', async (req, res) => {
   }
 
   res.json(data || []);
+});
+
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase.from('agendamentos').select(selectFields).eq('id', id).single();
+  if (error) {
+    return res.status(404).json({ error: `Agendamento ${id} não encontrado.` });
+  }
+  return res.json(data);
 });
 
 router.post('/', async (req, res) => {

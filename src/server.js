@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import clientesRouter from './routes/clientes.js';
 import agendamentosRouter from './routes/agendamentos.js';
+import atendimentosRouter from './routes/atendimentos.js';
 import dashboardRouter from './routes/dashboard.js';
 
 const app = express();
@@ -21,6 +22,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/clientes', clientesRouter);
 app.use('/api/agendamentos', agendamentosRouter);
+app.use('/api/atendimentos', atendimentosRouter);
 app.use('/api/dashboard', dashboardRouter);
 
 const __filename = fileURLToPath(import.meta.url);

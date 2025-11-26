@@ -23,7 +23,6 @@
         <a href="/pages/agendamentos.html" class="nav-item" title="Agendamentos">
           <span class="ico">🗓️</span><span class="label">Agendamentos</span>
         </a>
-        <!-- Aba ativa na sidebar -->
         <a href="/pages/atendimentos.html" class="nav-item active" title="Atendimentos">
           <span class="ico">💉</span><span class="label">Atendimentos</span>
         </a>
@@ -41,327 +40,140 @@
         <div>
           <h1>Atendimentos</h1>
           <p class="muted">
-            Registre anamnese, exame físico, diagnósticos e prescrição.
+            Conduza consultas, registre achados e acompanhe o histórico clínico.
           </p>
         </div>
         <div class="actions">
-          <button class="btn btn-ghost">Novo</button>
-          <button class="btn btn-primary">Salvar</button>
+          <button id="btnNovoAtendimento" class="btn btn-primary">Novo atendimento</button>
         </div>
       </header>
 
-      <!-- DADOS DO ATENDIMENTO -->
-      <form class="form" autocomplete="on">
-        <section class="card">
-          <h2 class="card-title">Identificação</h2>
-          <div class="grid g-4">
-            <label class="field field--2">
-              <span>Tutor</span>
-              <input
-                type="text"
-                name="tutor"
-                placeholder="Ex.: João da Silva"
-              />
+      <form id="formAtendimento" class="card form form-hidden" autocomplete="on">
+        <h2 class="card-title">Registro clínico</h2>
+        <input type="hidden" name="agendamento_id" />
+        <div class="grid g-4">
+          <label class="field field-2">
+            <span>Tutor</span>
+            <input type="text" name="tutor" list="listaAtdTutores" placeholder="Ex.: João da Silva" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>Pet</span>
+            <input type="text" name="pet" list="listaAtdPets" placeholder="Ex.: Luna" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>Espécie</span>
+            <select name="especie">
+              <option>Canina</option>
+              <option>Felina</option>
+              <option>Aves</option>
+              <option>Outros</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Veterinário</span>
+            <input type="text" name="veterinario" placeholder="Responsável pelo atendimento" />
+          </label>
+          <label class="field">
+            <span>Data</span>
+            <input type="date" name="data" />
+          </label>
+          <label class="field">
+            <span>Hora</span>
+            <input type="time" name="hora" />
+          </label>
+          <label class="field">
+            <span>Tipo</span>
+            <select name="tipo">
+              <option>Consulta</option>
+              <option>Retorno</option>
+              <option>Emergência</option>
+              <option>Check-up</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Status</span>
+            <select name="status">
+              <option>Em atendimento</option>
+              <option>Finalizado</option>
+              <option>Cancelado</option>
+            </select>
+          </label>
+        </div>
+
+        <section class="grid g-2 stack-sm">
+          <article class="card card-sub">
+            <h2 class="card-title">Anamnese</h2>
+            <label class="field">
+              <span>Resumo do atendimento</span>
+              <textarea rows="6" name="anamnese" placeholder="Queixa principal, histórico, sinais observados..."></textarea>
             </label>
             <label class="field">
-              <span>Pet</span>
-              <input type="text" name="pet" placeholder="Ex.: Luna" />
+              <span>Exame físico e observações</span>
+              <textarea rows="5" name="exame_obs" placeholder="Ausculta, palpação, inspeção, achados relevantes..."></textarea>
+            </label>
+          </article>
+
+          <article class="card card-sub">
+            <h2 class="card-title">Diagnóstico & exames</h2>
+            <label class="field">
+              <span>Hipóteses diagnósticas</span>
+              <textarea rows="4" name="hipoteses" placeholder="Diferenciais ou diagnósticos fechados"></textarea>
             </label>
             <label class="field">
-              <span>Espécie</span>
-              <select name="especie">
-                <option>Canina</option>
-                <option>Felina</option>
-                <option>Aves</option>
-                <option>Outros</option>
-              </select>
+              <span>Exames solicitados</span>
+              <textarea rows="3" name="exames" placeholder="Hemograma, bioquímica, imagem..."></textarea>
             </label>
             <label class="field">
-              <span>Veterinário</span>
-              <select name="veterinario">
-                <option>Dra. Ana</option>
-                <option>Dr. Bruno</option>
-                <option>Dra. Camila</option>
-              </select>
+              <span>Prescrição (um item por linha)</span>
+              <textarea rows="4" name="prescricao" placeholder="Fármaco, posologia, duração..."></textarea>
             </label>
-            <label class="field">
-              <span>Data</span>
-              <input type="date" name="data" />
-            </label>
-            <label class="field">
-              <span>Hora</span>
-              <input type="time" name="hora" />
-            </label>
-            <label class="field">
-              <span>Tipo</span>
-              <select name="tipo">
-                <option>Consulta</option>
-                <option>Retorno</option>
-                <option>Emergência</option>
-                <option>Check-up</option>
-              </select>
-            </label>
+          </article>
+        </section>
+
+        <div class="form-actions">
+          <button type="reset" class="btn btn-ghost">Limpar</button>
+          <div class="spacer"></div>
+          <button type="submit" class="btn btn-primary">Salvar atendimento</button>
+        </div>
+      </form>
+
+      <section class="card" id="lista-atendimentos">
+        <header class="agenda-header">
+          <div class="agenda-header__info">
+            <h2 class="card-title">Histórico de atendimentos</h2>
+            <p class="muted small">Últimos registros e status</p>
+          </div>
+          <span class="agenda-pill" id="atdCount">0 registros</span>
+          <div class="agenda-filters">
             <label class="field">
               <span>Status</span>
-              <select name="status">
+              <select id="atdFiltroStatus">
+                <option value="">Todos</option>
                 <option>Em atendimento</option>
                 <option>Finalizado</option>
                 <option>Cancelado</option>
               </select>
             </label>
+            <label class="field field-search">
+              <span>Buscar</span>
+              <input id="atdBusca" type="search" placeholder="Pet, tutor, veterinário..." />
+            </label>
           </div>
-        </section>
-
-        <!-- ANAMNESE / EXAME / DIAGNÓSTICO -->
-        <section class="grid g-2">
-          <article class="card">
-            <h2 class="card-title">Anamnese</h2>
-            <label class="field">
-              <span>Queixa principal e histórico</span>
-              <textarea
-                rows="6"
-                name="anamnese"
-                placeholder="Início dos sinais, alterações comportamentais, apetite, vômitos/diarreia, ingestão hídrica, ambiente, medicamentos em uso..."
-              ></textarea>
-            </label>
-          </article>
-
-          <article class="card">
-            <h2 class="card-title">Exame Físico</h2>
-            <div class="grid g-3">
-              <label class="field"
-                ><span>Peso (kg)</span
-                ><input type="number" step="0.01" name="peso"
-              /></label>
-              <label class="field"
-                ><span>Temperatura (°C)</span
-                ><input type="number" step="0.1" name="temp"
-              /></label>
-              <label class="field"
-                ><span>Frequência Cardíaca</span
-                ><input type="number" name="fc" placeholder="bpm"
-              /></label>
-              <label class="field"
-                ><span>Frequência Respiratória</span
-                ><input type="number" name="fr" placeholder="mov/min"
-              /></label>
-              <label class="field"
-                ><span>Hidratação</span>
-                <select name="hidratacao">
-                  <option>Normal</option>
-                  <option>Leve desidratação</option>
-                  <option>Moderada</option>
-                  <option>Grave</option>
-                </select>
-              </label>
-              <label class="field"
-                ><span>Mucosas</span>
-                <select name="mucosas">
-                  <option>Normocoradas</option>
-                  <option>Pálidas</option>
-                  <option>Hiperêmicas</option>
-                  <option>Ictéricas</option>
-                  <option>Cianóticas</option>
-                </select>
-              </label>
-            </div>
-            <label class="field">
-              <span>Achados adicionais</span>
-              <textarea
-                rows="4"
-                name="exame_obs"
-                placeholder="Ausculta, palpação, inspeção, dor, claudicação..."
-              ></textarea>
-            </label>
-          </article>
-        </section>
-
-        <section class="grid g-2">
-          <article class="card">
-            <h2 class="card-title">Hipóteses/Diagnóstico</h2>
-            <label class="field">
-              <span>Hipóteses diagnósticas</span>
-              <textarea
-                rows="4"
-                name="hipoteses"
-                placeholder="CID veterinário, diferenciais..."
-              ></textarea>
-            </label>
-            <label class="field">
-              <span>Exames solicitados</span>
-              <textarea
-                rows="3"
-                name="exames"
-                placeholder="Hemograma, bioquímica, imagem, parasitológico..."
-              ></textarea>
-            </label>
-            <label class="check"
-              ><input type="checkbox" /> <span>Solicitar retorno</span></label
-            >
-          </article>
-
-          <!-- PRESCRIÇÃO MÉDICA -->
-          <article class="card">
-            <h2 class="card-title">Prescrição Médica</h2>
-            <p class="muted small">
-              Inclua cada medicamento com dose, via, frequência e o número de
-              dias.
-            </p>
-
-            <div class="grid g-4 rx-grid">
-              <label class="field"
-                ><span>Medicamento</span
-                ><input
-                  type="text"
-                  name="rx_medicamento"
-                  placeholder="Ex.: Amoxicilina"
-              /></label>
-              <label class="field"
-                ><span>Dose</span
-                ><input
-                  type="text"
-                  name="rx_dose"
-                  placeholder="Ex.: 12,5 mg/kg"
-              /></label>
-              <label class="field"
-                ><span>Via</span>
-                <select name="rx_via">
-                  <option>VO</option>
-                  <option>IM</option>
-                  <option>IV</option>
-                  <option>SC</option>
-                  <option>Otológica</option>
-                  <option>Oftálmica</option>
-                </select>
-              </label>
-              <label class="field"
-                ><span>Frequência</span>
-                <select name="rx_freq">
-                  <option>SID (1×/dia)</option>
-                  <option>BID (2×/dia)</option>
-                  <option>TID (3×/dia)</option>
-                  <option>QID (4×/dia)</option>
-                  <option>q8h</option>
-                  <option>q12h</option>
-                </select>
-              </label>
-              <label class="field"
-                ><span>Dias</span
-                ><input
-                  type="number"
-                  name="rx_dias"
-                  min="1"
-                  step="1"
-                  placeholder="7"
-              /></label>
-              <label class="field field-2"
-                ><span>Observações</span
-                ><input
-                  type="text"
-                  name="rx_obs"
-                  placeholder="Administrar com alimento; evitar em gestação..."
-              /></label>
-            </div>
-
-            <!-- Lista (modelo) de itens prescritos -->
-            <div class="table-wrapper">
-              <table class="rx-table">
-                <thead>
-                  <tr>
-                    <th>Medicamento</th>
-                    <th>Dose</th>
-                    <th>Via</th>
-                    <th>Frequência</th>
-                    <th>Dias</th>
-                    <th>Obs.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Amoxicilina</td>
-                    <td>12,5 mg/kg</td>
-                    <td>VO</td>
-                    <td>BID</td>
-                    <td>7</td>
-                    <td>Com alimento</td>
-                  </tr>
-                  <tr>
-                    <td>Dipirona</td>
-                    <td>25 mg/kg</td>
-                    <td>VO</td>
-                    <td>TID</td>
-                    <td>3</td>
-                    <td>Se dor/Febre</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="form-actions">
-              <button type="button" class="btn btn-ghost">
-                Adicionar item
-              </button>
-              <div class="spacer"></div>
-              <button type="button" class="btn btn-ghost">
-                Imprimir prescrição
-              </button>
-            </div>
-          </article>
-        </section>
-
-        <!-- AÇÕES GERAIS -->
-        <div class="form-actions">
-          <button type="reset" class="btn btn-ghost">Limpar</button>
-          <div class="spacer"></div>
-          <button type="button" class="btn btn-danger">Cancelar</button>
-          <button type="submit" class="btn btn-primary">
-            Finalizar Atendimento
-          </button>
-        </div>
-      </form>
-
-      <!-- HISTÓRICO -->
-      <section class="card table-card">
-        <h2 class="card-title">Atendimentos Recentes</h2>
+        </header>
         <div class="table-wrapper">
-          <table>
+          <table class="agenda-table" aria-label="Lista de atendimentos">
             <thead>
               <tr>
                 <th>Data</th>
+                <th>Hora</th>
                 <th>Pet</th>
                 <th>Tutor</th>
-                <th>Veterinário</th>
-                <th>Tipo</th>
+                <th>Vet.</th>
                 <th>Status</th>
+                <th>Ações</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>20/09</td>
-                <td>Luna</td>
-                <td>Mariana S.</td>
-                <td>Dra. Ana</td>
-                <td>Consulta</td>
-                <td><span class="badge badge-success">Finalizado</span></td>
-              </tr>
-              <tr>
-                <td>20/09</td>
-                <td>Thor</td>
-                <td>Paulo H.</td>
-                <td>Dr. Bruno</td>
-                <td>Retorno</td>
-                <td>
-                  <span class="badge badge-warning">Em atendimento</span>
-                </td>
-              </tr>
-              <tr>
-                <td>19/09</td>
-                <td>Nina</td>
-                <td>Carla T.</td>
-                <td>Dra. Camila</td>
-                <td>Emergência</td>
-                <td><span class="badge badge-danger">Cancelado</span></td>
-              </tr>
-            </tbody>
+            <tbody id="atendimentosBody"></tbody>
           </table>
         </div>
       </section>
@@ -370,5 +182,11 @@
         <small>© Clínica Vet — Atendimentos</small>
       </footer>
     </main>
+
+    <datalist id="listaAtdTutores"></datalist>
+    <datalist id="listaAtdPets"></datalist>
+
+    <script src="../scripts/utils.js" defer></script>
+    <script src="../scripts/atendimentos.js" defer></script>
   </body>
 </html>

@@ -205,35 +205,29 @@
             <h2 class="card-title">Agenda</h2>
             <p class="muted small">Visualize todos os horários registrados</p>
           </div>
-          <span class="agenda-pill" id="agendaCount">0 registros</span>
-          <div class="agenda-filters">
-            <label class="field">
-              <span>De</span>
-              <input id="agendaDataDe" type="date" />
-            </label>
-            <label class="field">
-              <span>Até</span>
-              <input id="agendaDataAte" type="date" />
-            </label>
-            <label class="field">
-              <span>Status</span>
-              <select id="agendaStatus">
-                              <option value="">Todos</option>
-                              <option>Agendado</option>
-                              <option>Cancelado</option>
-                              <option>Compareceu</option>
-                              <option>Faltou</option>              </select>
-            </label>
-            <label class="field field-search">
-              <span>Buscar</span>
-              <input
-                id="agendaBusca"
-                type="search"
-                placeholder="Pet, tutor, serviço, vet..."
-              />
-            </label>
-          </div>
         </header>
+
+        <div class="agenda-filter-bar">
+          <label class="field">
+            <span>Espécie</span>
+            <select id="agendaEspecie">
+              <option value="">Todas</option>
+              <option value="Canina">Canina</option>
+              <option value="Felina">Felina</option>
+              <option value="Aves">Aves</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Período</span>
+            <select id="agendaPeriodo">
+              <option value="7">Últimos 7 dias</option>
+              <option value="15">Últimos 15 dias</option>
+              <option value="30">Últimos 30 dias</option>
+              <option value="">Todos</option>
+            </select>
+          </label>
+        </div>
 
         <div class="table-wrapper">
           <table class="agenda-table" aria-label="Agenda de agendamentos">

@@ -1,34 +1,147 @@
-.form .grid {
-  gap: 14px;
+:root {
+  --card-bg: rgba(12, 18, 38, 0.85);
 }
 
-.rx-grid .field-2 {
-  grid-column: span 2;
+.form .grid {
+  gap: 16px;
+}
+
+.card-sub {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-sub .card-title {
+  margin: 0;
+}
+
+.card-sub .field + .field {
+  margin-top: 8px;
+}
+
+.card-sub .field textarea,
+.card-sub .field input {
+  margin-top: 6px;
+}
+
+.stack-sm {
+  align-items: stretch;
+}
+
+.stack-sm .card {
+  height: 100%;
 }
 
 .form-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
-  grid-column: 1 / -1;
+  padding-top: 12px;
 }
 
 .form-actions .spacer {
   flex: 1;
 }
 
-.table-wrapper table {
-  min-width: 680px;
+.agenda-header {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: flex-start;
 }
 
-@media (max-width: 740px) {
-  .g-4,
-  .g-3,
-  .g-2 {
-    grid-template-columns: 1fr;
-  }
+.agenda-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-  .field-2 {
-    grid-column: span 1;
+.agenda-pill {
+  justify-self: flex-start;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.agenda-filters {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.agenda-table tr.row-highlight {
+  outline: 2px solid rgba(99, 102, 241, 0.85);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.btn-small {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(9, 13, 32, 0.75);
+  color: var(--text);
+  transition: transform 0.2s ease;
+}
+
+.btn-small-ghost {
+  background: transparent;
+}
+
+.btn-small:hover {
+  transform: translateY(-1px);
+  border-color: rgba(111, 110, 251, 0.6);
+}
+
+.form-hidden {
+  display: none;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.detail-label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.detail-value {
+  display: block;
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+.detail-full {
+  grid-column: 1 / -1;
+}
+
+.reminder-list {
+  list-style: disc;
+}
+
+@media (max-width: 720px) {
+  .agenda-header {
+    grid-template-columns: 1fr;
   }
 }
