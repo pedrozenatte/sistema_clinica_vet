@@ -201,6 +201,9 @@
   border-radius: 14px;
   padding: 20px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal__header {
@@ -209,12 +212,15 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .modal__body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 @media (max-width: 720px) {
