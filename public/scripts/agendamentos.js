@@ -169,9 +169,9 @@
           <td>${Utils.formatPhone(item.contato || '')}</td>
           <td>
             <div class="table-actions">
-              <button class="btn-small btn-small-ghost" data-id="${item.id}" data-action="ver">Ver</button>
-              <button class="btn-small" data-id="${item.id}" data-action="editar">Editar</button>
-              <button class="btn-small" data-id="${item.id}" data-action="atender" ${podeAtender ? '' : 'disabled'}>
+              <button type="button" class="btn-small btn-small-ghost" data-id="${item.id}" data-action="ver">Ver</button>
+              <button type="button" class="btn-small" data-id="${item.id}" data-action="editar">Editar</button>
+              <button type="button" class="btn-small" data-id="${item.id}" data-action="atender" ${podeAtender ? '' : 'disabled'}>
                 Atender
               </button>
             </div>
@@ -240,36 +240,64 @@
   // --- Modal Logic (Ver) ---
   const toggleModalDetalhes = (open) => {
     if (!modalDetalhes) return;
-    if (open) modalDetalhes.removeAttribute('hidden');
-    else modalDetalhes.setAttribute('hidden', 'hidden');
+    if (open) {
+      modalDetalhes.removeAttribute('hidden');
+      modalDetalhes.style.display = 'flex';
+    } else {
+      modalDetalhes.setAttribute('hidden', 'hidden');
+      modalDetalhes.style.display = 'none';
+    }
   };
 
   const showDetalhes = (id) => {
-    const item = agendamentos.find(a => a.id == id); // Loose equality in case of string/number mismatch
-    if (!item) return;
+    const item = agendamentos.find((a) => a.id == id); // tolera string/number
+    if (!item) {
+      alert('Agendamento não encontrado.');
+      return;
+    }
+
+    const detalhes = [
+      { label: 'Data', value: displayDate(item.data) },
+      { label: 'Hora', value: displayTime(item.hora) },
+      { label: 'Tutor', value: item.tutor_nome || '—' },
+      { label: 'Contato', value: Utils.formatPhone(item.contato || '') || '—' },
+      { label: 'Pet', value: item.pet_nome || '—' },
+      { label: 'Espécie', value: item.especie || '—' },
+      { label: 'Serviço', value: item.servico || '—' },
+      { label: 'Veterinário', value: item.veterinario || '—' },
+      { label: 'Tipo', value: item.tipo || '—' },
+      { label: 'Prioridade', value: item.prioridade || '—' },
+      { label: 'Canal', value: item.canal || '—' },
+      { label: 'Duração', value: item.duracao || '—' },
+    ];
 
     if (detalhesBody) {
-        detalhesBody.innerHTML = `
-            <div class="detail-grid">
-                <div><span class="detail-label">Data</span><strong class="detail-value">${displayDate(item.data)}</strong></div>
-                <div><span class="detail-label">Hora</span><strong class="detail-value">${displayTime(item.hora)}</strong></div>
-                
-                <div><span class="detail-label">Tutor</span><strong class="detail-value">${item.tutor_nome}</strong></div>
-                <div><span class="detail-label">Contato</span><strong class="detail-value">${Utils.formatPhone(item.contato)}</strong></div>
-
-                <div><span class="detail-label">Pet</span><strong class="detail-value">${item.pet_nome}</strong></div>
-                <div><span class="detail-label">Espécie</span><strong class="detail-value">${item.especie || '-'}</strong></div>
-
-                <div><span class="detail-label">Serviço</span><strong class="detail-value">${item.servico}</strong></div>
-                <div><span class="detail-label">Veterinário</span><strong class="detail-value">${item.veterinario}</strong></div>
-
-                <div><span class="detail-label">Status</span><strong class="detail-value">${item.status}</strong></div>
-                <div><span class="detail-label">Duração</span><strong class="detail-value">${item.duracao || '-'}</strong></div>
-
-                <div class="detail-full"><span class="detail-label">Observações</span><p>${item.observacoes || '—'}</p></div>
-            </div>
-        `;
+      const statusBadge = `<span class="badge ${badgeClass(item.status)}">${item.status || '—'}</span>`;
+      detalhesBody.innerHTML = `
+        <section class="detail-section">
+          <header class="detail-section__header">
+            <h3>Dados do agendamento</h3>
+            ${statusBadge}
+          </header>
+          <div class="detail-grid">
+            ${detalhes
+              .map(
+                (d) =>
+                  `<div><span class="detail-label">${d.label}</span><strong class="detail-value">${d.value}</strong></div>`,
+              )
+              .join('')}
+          </div>
+        </section>
+        <section class="detail-section">
+          <header class="detail-section__header">
+            <h3>Observações</h3>
+          </header>
+          <p class="detail-value">${item.observacoes || '—'}</p>
+        </section>
+      `;
     }
+    const titulo = document.getElementById('detalhesTitulo');
+    if (titulo) titulo.textContent = 'Agendamento';
     toggleModalDetalhes(true);
   };
 
