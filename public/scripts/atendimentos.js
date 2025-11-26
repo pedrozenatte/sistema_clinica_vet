@@ -6,6 +6,10 @@
   const filtroBusca = document.getElementById('atdBusca');
   const listaTutores = document.getElementById('listaAtdTutores');
   const listaPets = document.getElementById('listaAtdPets');
+  const modalDetalhes = document.getElementById('modalDetalhesAtd');
+  const detalhesBody = document.getElementById('detalhesAtdBody');
+  const detalhesTitulo = document.getElementById('detalhesAtdTitulo');
+  const btnFecharDetalhes = document.getElementById('btnFecharDetalhesAtd');
 
   let atendamentos = [];
   let clientes = [];
@@ -125,8 +129,9 @@
           <td><span class="badge ${badgeClass(item.status)}">${item.status}</span></td>
           <td>
             <div class="table-actions">
-              <button class="btn-small btn-small-ghost" data-id="${item.id}" data-action="editar">Editar</button>
-              <button class="btn-small" data-id="${item.id}" data-action="excluir">Excluir</button>
+              <button type="button" class="btn-small btn-small-ghost" data-id="${item.id}" data-action="ver">Ver</button>
+              <button type="button" class="btn-small btn-small-ghost" data-id="${item.id}" data-action="editar">Editar</button>
+              <button type="button" class="btn-small" data-id="${item.id}" data-action="excluir">Excluir</button>
             </div>
           </td>
         </tr>
@@ -327,6 +332,79 @@
     }
   };
 
+  const toggleModalDetalhes = (open) => {
+    if (!modalDetalhes) return;
+    if (open) {
+      modalDetalhes.removeAttribute('hidden');
+      modalDetalhes.style.display = 'flex';
+    } else {
+      modalDetalhes.setAttribute('hidden', 'hidden');
+      modalDetalhes.style.display = 'none';
+    }
+  };
+
+  const showDetalhes = (id) => {
+    const item = atendimentos.find((atd) => atd.id == id);
+    if (!item) {
+      alert('Atendimento não encontrado.');
+      return;
+    }
+
+    const dadosPrincipais = [
+      { label: 'Data', value: displayDate(item.data) },
+      { label: 'Hora', value: displayTime(item.hora) },
+      { label: 'Tutor', value: item.tutor_nome || '—' },
+      { label: 'Pet', value: item.pet_nome || '—' },
+      { label: 'Espécie', value: item.especie || '—' },
+      { label: 'Veterinário', value: item.veterinario || '—' },
+      { label: 'Tipo', value: item.tipo || '—' },
+      { label: 'Status', value: item.status || '—' },
+    ];
+
+    const bloco = (label, valor) => `
+      <div>
+        <span class="detail-label">${label}</span>
+        <strong class="detail-value">${valor || '—'}</strong>
+      </div>`;
+
+    if (detalhesBody) {
+      const statusBadge = `<span class="badge ${badgeClass(item.status)}">${item.status || '—'}</span>`;
+      const prescricaoList = Array.isArray(item.prescricao) ? item.prescricao : (item.prescricao ? [item.prescricao] : []);
+      detalhesBody.innerHTML = `
+        <section class="detail-section">
+          <header class="detail-section__header">
+            <h3>Dados do atendimento</h3>
+            ${statusBadge}
+          </header>
+          <div class="detail-grid">
+            ${dadosPrincipais.map((d) => bloco(d.label, d.value)).join('')}
+          </div>
+        </section>
+        <section class="detail-section">
+          <header class="detail-section__header">
+            <h3>Anotações</h3>
+          </header>
+          <div class="detail-grid">
+            ${bloco('Anamnese', item.anamnese)}
+            ${bloco('Exame/Observações', item.exame_obs)}
+            ${bloco('Hipóteses', item.hipoteses)}
+            ${bloco('Exames solicitados', item.exames)}
+            <div class="detail-full">
+              <span class="detail-label">Prescrição</span>
+              ${
+                prescricaoList.length
+                  ? `<ul class="detail-list">${prescricaoList.map((p) => `<li>${p}</li>`).join('')}</ul>`
+                  : '<p class="detail-value">—</p>'
+              }
+            </div>
+          </div>
+        </section>
+      `;
+    }
+    if (detalhesTitulo) detalhesTitulo.textContent = 'Atendimento';
+    toggleModalDetalhes(true);
+  };
+
   const onSubmit = async (event) => {
     event.preventDefault();
     if (!form) return;
@@ -397,7 +475,9 @@
     const btn = event.target.closest('button[data-action]');
     if (!btn) return;
     const { action, id } = btn.dataset;
-    if (action === 'editar') {
+    if (action === 'ver') {
+      showDetalhes(id);
+    } else if (action === 'editar') {
       startEditing(id);
     } else if (action === 'excluir') {
       deletarAtendimento(id);
@@ -420,6 +500,11 @@
 
   filtroStatus?.addEventListener('change', aplicarFiltros);
   filtroBusca?.addEventListener('input', Utils.debounce(aplicarFiltros, 200));
+
+  btnFecharDetalhes?.addEventListener('click', () => toggleModalDetalhes(false));
+  modalDetalhes?.addEventListener('click', (event) => {
+    if (event.target === modalDetalhes) toggleModalDetalhes(false);
+  });
 
   const tutorInput = form?.querySelector('[name="tutor"]');
   const petInput = form?.querySelector('[name="pet"]');

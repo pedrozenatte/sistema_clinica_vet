@@ -3,6 +3,7 @@
   const tableAgenda = document.getElementById('agendaBody');
   const filtroEspecie = document.getElementById('agendaEspecie');
   const filtroPeriodo = document.getElementById('agendaPeriodo');
+  const filtroBusca = document.getElementById('agendaBusca');
   const agendaCountLabel = document.getElementById('agendaCount');
   
   const formAgendamento = document.querySelector('#formAgendamentoWrapper'); 
@@ -224,6 +225,7 @@
   const aplicarFiltros = () => {
     const especieFiltro = (filtroEspecie?.value || '').toLowerCase();
     const periodoDias = parseInt(filtroPeriodo?.value || '', 10);
+    const busca = (filtroBusca?.value || '').trim().toLowerCase();
     const hoje = new Date();
     const inicio =
       !Number.isNaN(periodoDias) && periodoDias > 0
@@ -235,6 +237,10 @@
       if (Number.isNaN(dataAtual)) return false;
       if (inicio && dataAtual < inicio) return false;
       if (especieFiltro && (item.especie || '').toLowerCase() !== especieFiltro) return false;
+      if (busca) {
+        const tutor = (item.tutor_nome || '').toLowerCase();
+        if (!tutor.includes(busca)) return false;
+      }
       return true;
     });
 
@@ -681,6 +687,7 @@
 
   filtroEspecie?.addEventListener('change', aplicarFiltros);
   filtroPeriodo?.addEventListener('change', aplicarFiltros);
+  filtroBusca?.addEventListener('input', Utils.debounce(aplicarFiltros, 200));
   formAgendamento?.addEventListener('submit', onSubmit);
 
   // Initial loads
