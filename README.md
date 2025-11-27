@@ -1,123 +1,103 @@
-# Sistema de Gestão para Clínicas Veterinárias  
-**SCC0219 - Introdução ao Desenvolvimento Web**  
-Profa. Dra. Bruna Carolina Rodrigues da Cunha  
-Primeira entrega: 15/09/2025  
+# Sistema de Gestão para Clínicas Veterinárias
+**SCC0219 - Introdução ao Desenvolvimento Web**
+Profa. Dra. Bruna Carolina Rodrigues da Cunha
+Primeira entrega: 15/09/2025
 
 ## 👥 Membros
-- Guilherme Augusto Fincatti da Silva — 13676986  
-- Marco Antonio Gaspar Garcia — 11833581  
-- Pedro Guilherme de Barros Zenatte — 13676919  
+- Guilherme Augusto Fincatti da Silva — 13676986
+- Marco Antonio Gaspar Garcia — 11833581
+- Pedro Guilherme de Barros Zenatte — 13676919
 
-Alunos de Engenharia de Computação da USP São Carlos.  
+Alunos de Engenharia de Computação da USP São Carlos.
 
 | [<img loading="lazy" src="https://avatars.githubusercontent.com/u/117095562?v=4" width=115><br><sub>Guilherme Fincatti</sub>](https://github.com/GuilhermeFincatti) | [<img loading="lazy" src="https://avatars.githubusercontent.com/u/105023846?v=4" width=115><br><sub>Marco Garcia</sub>](https://github.com/marcogarcia2) | [<img loading="lazy" src="https://avatars.githubusercontent.com/u/107310680?v=4" width=115><br><sub>Pedro Zenatte</sub>](https://github.com/pedrozenatte) |
-| :---: | :---: | :---: |  
+| :---: | :---: | :---: |
 
 ---
 
 ## 📌 Descrição
-A ideia central é fornecer um **site gratuito** de organização e gerenciamento para veterinários e clínicas veterinárias.  
-O sistema visa **facilitar a gestão de cadastros, atendimentos, internações e prontuários**, além de **organizar agendamentos** e fornecer **relatórios em tempo real**.  
-
----
-
-## ⚙️ Requisitos  
-Com base na conversa com a cliente, levantamos os seguintes requisitos iniciais:  
-
-### Funcionais
-- [ ] Cadastro de animais e tutores.  
-- [ ] Agendamento de consultas e procedimentos.  
-- [ ] Registro de atendimentos realizados.  
-- [ ] Gerenciamento de internações.  
-- [ ] Emissão e consulta de prontuários.  
-- [ ] Painel de indicadores (número de atendimentos, tempo médio, status etc.).  
-
-### Não Funcionais
-- [ ] Interface responsiva para desktop e mobile.  
-- [ ] Navegação simples e intuitiva.  
+A ideia central é fornecer um **site gratuito** de organização e gerenciamento para veterinários e clínicas veterinárias.
+O sistema visa facilitar a gestão de cadastros, agendamentos e atendimentos, oferecendo uma interface web responsiva e integrada a um backend robusto.
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
+O projeto foi desenvolvido utilizando as seguintes tecnologias:
+
 ### Frontend
-- **HTML5** e **CSS3** → estrutura e estilo  
-- **JavaScript (ES6+)** → interatividade e lógica  
+- **HTML5** e **CSS3**: Estrutura e estilização das páginas.
+- **JavaScript (ES6+)**: Lógica de interface e interatividade.
 
 ### Backend
-- **Node.js** → runtime JavaScript
-- **Express.js** → framework web  
-- **Sequelize** → ORM para banco de dados  
-- **SQLite3** → banco de dados relacional  
-- **CORS** → comunicação frontend-backend  
+- **Node.js**: Ambiente de execução JavaScript.
+- **Express.js**: Framework web para criação das APIs RESTful.
+- **Supabase**: Plataforma utilizada como Backend-as-a-Service (BaaS), provendo banco de dados (PostgreSQL) e serviços de autenticação.
+- **CORS**: Middleware para controle de acesso HTTP.
+- **Dotenv**: Gerenciamento de variáveis de ambiente.
 
-### Versionamento
-- **Git & GitHub** → versionamento e colaboração  
-
----
-
-## 🚀 Como Começar
-
-### Instalação Rápida
-
-1. **Instalar dependências:**
-```bash
-npm install
-```
-
-2. **Criar banco com dados de exemplo (opcional):**
-```bash
-npm run seed
-```
-
-3. **Iniciar servidor:**
-```bash
-npm run dev
-```
-
-4. **Acessar a aplicação:**
-```
-http://localhost:3000
-```
-
-### 📚 Documentação
-- **[INICIO_RAPIDO.md](INICIO_RAPIDO.md)** - Guia de início rápido
-- **[DOCUMENTACAO.md](DOCUMENTACAO.md)** - Documentação técnica completa
-- **[EXEMPLOS_API.md](EXEMPLOS_API.md)** - Exemplos de requisições
-- **[RESUMO.md](RESUMO.md)** - Resumo da implementação
+### Ferramentas
+- **Git & GitHub**: Controle de versão e colaboração.
 
 ---
 
-## ✅ Status de Implementação
+## ✅ Funcionalidades
 
-### Funcionalidades Concluídas ✓
+O sistema encontra-se em desenvolvimento. Abaixo está o status das funcionalidades planejadas:
 
-#### Cadastro de Clientes e Pets
-- [x] Criar novo cliente (Física/Jurídica)
-- [x] Cadastrar múltiplos pets por cliente
-- [x] Editar informações de cliente e pet
-- [x] Deletar cliente (cascata para pets)
-- [x] Inativar cliente
-- [x] Lista com filtros e busca
-- [x] Validações completas
+### 🚀 Funcionalidades Implementadas
+- **Autenticação e Cadastro**: Sistema de login e registro de usuários.
+- **Gestão de Tutores e Pets**:
+  - Cadastro completo de tutores.
+  - Cadastro de animais vinculados aos tutores.
+  - Edição e visualização de dados.
+- **Agendamentos**:
+  - Criação de novos agendamentos para consultas.
+  - Visualização da agenda.
+- **Atendimentos**:
+  - Registro de atendimentos clínicos realizados.
+- **Dashboard**:
+  - Painel administrativo para visão geral do sistema.
 
-#### API RESTful
-- [x] Endpoints para clientes (CRUD)
-- [x] Endpoints para pets (CRUD)
-- [x] Endpoints para agendamentos (CRUD)
-- [x] Endpoints para veterinários
-- [x] Endpoints para serviços
-- [x] Tratamento de erros
-- [x] Validações de dados
-
-#### Banco de Dados
-- [x] Modelos relacionais (Cliente, Pet, Agendamento, Veterinário, Serviço)
-- [x] Relacionamentos (1:N)
-- [x] Soft delete para veterinários e serviços
-- [x] Integridade referencial
-- [x] Seed com dados de exemplo
+### 🚧 Funcionalidades Não Implementadas / Futuras
+- **Prontuário Eletrônico**: Histórico médico detalhado dos animais.
+- **Internação**: Módulo para gestão de animais internados e acompanhamento de estado.
 
 ---
 
-## 📸 Protótipo
-![screenshot do dashboard](./public/assets/images/dashboard.png)  
+## 🚀 Como Rodar o Projeto
+
+Siga os passos abaixo para executar o ambiente de desenvolvimento:
+
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/pedrozenatte/Sistema-para-Clinica-Veterinaria.git
+   cd sistema_clinica_vet
+   ```
+
+2. **Instale as dependências:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure as Variáveis de Ambiente:**
+   Crie um arquivo `.env` na raiz do projeto e adicione as credenciais do seu projeto Supabase:
+   ```env
+   SUPABASE_URL=sua_url_do_supabase
+   SUPABASE_SERVICE_ROLE=sua_chave_service_role
+   # ou
+   SUPABASE_ANON_KEY=sua_chave_anonima
+   ```
+
+4. **Inicie o servidor:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Acesse a aplicação:**
+   Abra o navegador em `http://localhost:3000`
+
+---
+
+## 📸 Visualização
+![screenshot do dashboard](./public/assets/images/dashboard.png)
