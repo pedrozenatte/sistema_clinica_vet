@@ -1,4 +1,5 @@
 (() => {
+  // Este módulo controla tanto o CRUD quanto as visões em tabela; cuidar para manter caches em sincronia.
   const tableBody = document.getElementById('cadastrosBody');
   const petsTableBody = document.getElementById('petsBody');
   const situacaoFiltro = document.getElementById('fSituacao');
@@ -150,6 +151,7 @@
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase();
 
+  // Montamos uma lista achatada de pets para poder alternar de visão rapidamente.
   const rebuildPetsCache = () => {
     petsCache = clientes.flatMap((cliente) =>
       (cliente.pets || []).map((pet) => ({

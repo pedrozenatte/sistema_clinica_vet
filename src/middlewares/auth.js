@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabaseClient.js';
 
 const AUTH_COOKIE = 'sb_access_token';
 
+// Decodifica o header Cookie em um map simples; evita libs externas para algo trivial.
 const parseCookies = (cookieHeader = '') =>
   cookieHeader
     .split(';')
@@ -43,6 +44,7 @@ export const clearSessionCookie = (res) => {
   });
 };
 
+// Apenas anexa o usuário se houver token, permitindo páginas públicas consumirem res.locals.user.
 export const attachUserIfPresent = async (req, res, next) => {
   const token = getTokenFromRequest(req);
   if (!token) return next();

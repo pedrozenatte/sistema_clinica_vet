@@ -1,4 +1,5 @@
 (() => {
+  // Dashboard consome apenas um endpoint e popula cartões, tabelas e donut.
   const periodSelect = document.getElementById('dashboardPeriodo');
   const kpiAtendimentos = document.getElementById('kpiAtendimentos');
   const kpiMediaTempo = document.getElementById('kpiMediaTempo');

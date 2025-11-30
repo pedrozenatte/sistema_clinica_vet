@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient.js';
 
 const router = Router();
 const baseSelect = '*,pets ( * )';
+// Mantemos um código curto CLI-XXXX para facilitar buscas na UI.
 const generateCodigo = () => `CLI-${randomUUID().split('-')[0].toUpperCase()}`;
 
 const sanitizePattern = (value = '') => `%${value}%`.replace(/,/g, '');

@@ -1,4 +1,5 @@
 (() => {
+  // Script da aba de agendamentos: mistura painel (cards) e formulário com um único estado local.
   const tableProximos = document.getElementById('proximosBody');
   const tableAgenda = document.getElementById('agendaBody');
   const filtroEspecie = document.getElementById('agendaEspecie');
@@ -513,6 +514,7 @@
   // --- Event Listeners ---
 
   // 1. Table Actions (Ver / Editar)
+  // Ao clicar em "Atender", abrimos automaticamente um registro clínico já preenchido.
   const criarAtendimento = async (agendamento) => {
     const payload = {
       agendamento_id: agendamento.id,

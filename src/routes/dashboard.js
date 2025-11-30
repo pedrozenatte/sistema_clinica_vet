@@ -35,6 +35,7 @@ const parseDurationToMinutes = (value) => {
   return null;
 };
 
+// Envelopa chamadas ao Supabase para não quebrar o painel mesmo com colunas ausentes.
 const safeQuery = async (promise, fallback = []) => {
   try {
     const { data, error, count } = await promise;

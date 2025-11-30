@@ -1,7 +1,7 @@
 # Sistema de Gestão para Clínicas Veterinárias
 **SCC0219 - Introdução ao Desenvolvimento Web**
+
 Profa. Dra. Bruna Carolina Rodrigues da Cunha
-Primeira entrega: 15/09/2025
 
 ## 👥 Membros
 - Guilherme Augusto Fincatti da Silva — 13676986
@@ -99,5 +99,5 @@ Siga os passos abaixo para executar o ambiente de desenvolvimento:
 
 ---
 
-## 📸 Visualização
-![screenshot do dashboard](./public/assets/images/dashboard.png)
+## 📸 Fotos
+![screenshot do dashboard](./public/assets/images/dashboard_v2.png)

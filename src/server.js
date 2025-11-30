@@ -22,8 +22,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Rotas públicas de autenticação (signup/login) ficam acessíveis antes dos guardas.
 app.use('/api/auth', authRouter);
 
+// A partir daqui todas as páginas e APIs conferem se há sessão Supabase válida.
 app.use(attachUserIfPresent);
 app.use(requirePageAuth);
 app.use('/api', requireAuth);
@@ -39,6 +41,7 @@ const publicDir = path.join(__dirname, '..', 'public');
 
 app.use(express.static(publicDir));
 
+// Qualquer caminho desconhecido fora de /api volta para o dashboard (SPA simples).
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'Endpoint não encontrado.' });

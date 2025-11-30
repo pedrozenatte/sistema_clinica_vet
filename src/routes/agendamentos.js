@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient.js';
 
 const router = Router();
 
+// Selecionamos sempre o mesmo conjunto para manter frontend e dashboard sincronizados.
 const selectFields =
   'id,cliente_id,pet_id,data,hora,pet_nome,especie,tutor_nome,servico,veterinario,status,contato,destaque,observacoes,canal,duracao,tipo,prioridade';
 

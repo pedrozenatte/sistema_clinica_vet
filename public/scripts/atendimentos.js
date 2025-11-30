@@ -1,4 +1,5 @@
 (() => {
+  // Responsável por listar e editar atendimentos; compartilha a mesma UI tanto para novos casos quanto vindos de agendamentos.
   const tableBody = document.getElementById('atendimentosBody');
   const form = document.getElementById('formAtendimento');
   const btnNovo = document.getElementById('btnNovoAtendimento');
@@ -94,6 +95,7 @@
     return cliente.pets.find((pet) => (pet.nome || '').toLowerCase() === petNome.toLowerCase());
   };
 
+  // Esses campos ficam "travados" quando o atendimento veio direto de um agendamento.
   const lockableFields = ['tutor', 'pet', 'especie', 'data', 'hora', 'tipo'];
 
   const setFieldLock = (name, value, locked) => {

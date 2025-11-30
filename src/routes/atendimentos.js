@@ -7,6 +7,7 @@ const selectFields =
 
 const sanitizePattern = (value = '') => `%${value}%`.replace(/,/g, '');
 
+// A prescrição pode vir como array, string JSON ou textarea; convertemos para array consistente.
 const normalizePrescricao = (value) => {
   if (Array.isArray(value)) {
     return value;
